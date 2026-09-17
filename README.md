@@ -124,13 +124,14 @@ Die Seite wird komplett statisch gebaut. Auf Cloudflare läuft sie als reines
 Static-Asset-Deployment — es gibt kein Worker-Script, nur den Ordner `dist`.
 
 ```bash
-npx wrangler deploy
+npm run deploy
 ```
 
-Ein separater `npm run build` davor ist nicht nötig: `wrangler.jsonc` enthält
-einen `build.command`, den Wrangler vor jedem Deploy ausführt. Deshalb genügt in
-den Cloudflare Workers Builds als Deploy-Befehl ebenfalls `npx wrangler deploy` —
-ein eigener Build-Befehl im Dashboard muss nicht gesetzt sein.
+Das Script baut zuerst nach `dist/` und ruft dann `wrangler deploy` auf, das den
+Ordner hochlädt. Gebaut wird bewusst außerhalb von `wrangler.jsonc`: In den
+Cloudflare Workers Builds erledigt das der Build-Befehl `npm run build`, und ein
+zusätzlicher `build.command` in der Wrangler-Konfiguration würde den Build dort
+ein zweites Mal laufen lassen.
 
 Beim ersten lokalen Deploy fragt Wrangler nach dem Cloudflare-Login.
 
@@ -141,7 +142,7 @@ Beim ersten lokalen Deploy fragt Wrangler nach dem Cloudflare-Login.
 | Repository | `beon-glashoff/hnojaeger` |
 | Projektname / Worker | `hnojaeger` |
 | Root-Verzeichnis | `/` |
-| Build-Befehl | *leer* (übernimmt `wrangler.jsonc`) |
+| Build-Befehl | `npm run build` |
 | Deploy-Befehl | `npx wrangler deploy` |
 | Branch | `main` |
 

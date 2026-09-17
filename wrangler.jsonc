@@ -3,12 +3,9 @@
   "name": "hnojaeger",
   "compatibility_date": "2026-09-17",
 
-  // Wrangler baut vor jedem Deploy selbst. Dadurch genuegt in der Cloudflare-CI
-  // der Deploy-Befehl "npx wrangler deploy" - ohne diesen Hook faende er kein ./dist.
-  "build": {
-    "command": "npm run build",
-    "watch_dir": "src"
-  },
+  // Kein "build"-Hook: Gebaut wird vorher, in der Cloudflare-CI ueber den
+  // Build-Befehl "npm run build", lokal ueber "npm run deploy". Stuende der
+  // Hook zusaetzlich hier, liefe der Build in der CI zweimal.
 
   // Reines Static-Asset-Deployment: kein Worker-Script noetig.
   // "auto-trailing-slash" passt zu trailingSlash: 'always' und

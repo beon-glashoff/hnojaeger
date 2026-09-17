@@ -1,0 +1,197 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site, kontakt, kammer, impressum } from '../data/site';
+
+/**
+ * Pflichtangaben nach § 5 DDG und, weil der Arztberuf ein reglementierter Beruf
+ * ist, nach § 5 Abs. 1 Nr. 5 DDG. Grundlage: 05_Recht-und-Datenschutz.md,
+ * Abschnitt 5.
+ *
+ * Die Anschrift steht ausschließlich auf dieser Seite. Sie ist die
+ * Privatanschrift und keine Praxisadresse — im Footer, in den strukturierten
+ * Daten und in Open Graph taucht sie deshalb nicht auf.
+ *
+ * ENTWURF – vor dem Go-live anwaltlich prüfen lassen. Die mit „noch offen"
+ * ausgewiesenen Angaben sind Pflichtangaben und müssen vorher stehen.
+ */
+const anschrift = kontakt.anschrift;
+---
+
+<BaseLayout
+  variant="dunkel"
+  modeToggle
+  noindex
+  title={`Impressum – ${site.nameShort}`}
+  description="Anbieterkennzeichnung und berufsrechtliche Angaben."
+>
+  <section class="section">
+    <div class="container">
+      <nav class="krumen small" aria-label="Brotkrumen"><a href="/">Start</a></nav>
+
+      <h1 class="display titel">Impressum</h1>
+
+      <div class="text prose">
+        <h2 class="h3">Anbieterin</h2>
+        <p>
+          {site.name}<br />
+          {site.role}<br />
+          {anschrift.strasse}<br />
+          {anschrift.plz} {anschrift.ort}
+        </p>
+        <p class="hinweis">
+          Diese Anschrift erfüllt die Pflicht zur ladungsfähigen Anschrift. Sie ist
+          keine Praxisadresse — eine Sprechstunde findet dort nicht statt. Wo
+          {' '}{site.nameShort} tätig ist, steht auf der
+          {' '}<a href="/#sprechstunden" class="link">Startseite</a>.
+        </p>
+
+        <h2 class="h3">Kontakt</h2>
+        <p>
+          E-Mail: <a href={`mailto:${kontakt.email}`} class="link">{kontakt.email}</a><br />
+          Telefon: <a href={`tel:${kontakt.telefonHref}`} class="link">{kontakt.telefon}</a>
+        </p>
+        <p class="hinweis">
+          Bitte senden Sie per E-Mail keine Angaben zu Ihrer Gesundheit. E-Mail ist
+          dafür kein geeigneter Weg, und eine medizinische Beratung ist über diese
+          Website ohnehin nicht möglich — siehe
+          {' '}<a href="/gesundheitsinformationen/" class="link">Gesundheitsinformationen</a>.
+        </p>
+
+        <h2 class="h3">Verantwortlich für den Inhalt</h2>
+        <p>
+          {site.name}, Anschrift wie oben.<br />
+          <span class="klein">Nach § 18 Abs. 2 Medienstaatsvertrag.</span>
+        </p>
+
+        <h2 class="h3">Berufsbezeichnung</h2>
+        <p>
+          {impressum.berufsbezeichnung}<br />
+          Verliehen in der {impressum.verliehenIn}
+        </p>
+
+        <h2 class="h3">Zuständige Kammer</h2>
+        <p>
+          {kammer.name}<br />
+          {kammer.strasse}<br />
+          {kammer.plz} {kammer.ort}<br />
+          <a href={kammer.url} class="link" rel="noopener">{kammer.url.replace('https://', '')}</a>
+        </p>
+
+        <h2 class="h3">Approbationsbehörde</h2>
+        {impressum.approbationsbehoerde
+          ? <p>{impressum.approbationsbehoerde}</p>
+          : <p><span class="offen">Angabe noch offen</span> — die zuständige
+              Bezirksregierung wird vor der Veröffentlichung ergänzt.</p>}
+
+        <h2 class="h3">Berufsrechtliche Regelungen</h2>
+        <p>
+          Es gelten die folgenden Regelungen, jeweils in der geltenden Fassung:
+        </p>
+        <ul>
+          <li>Heilberufsgesetz Nordrhein-Westfalen (HeilBerG NRW)</li>
+          <li>Berufsordnung für die nordrheinischen Ärztinnen und Ärzte</li>
+          <li>Gebührenordnung für Ärzte (GOÄ)</li>
+        </ul>
+        <p>
+          Die Berufsordnung ist bei der {kammer.name} einsehbar:
+          {' '}<a href={kammer.url} class="link" rel="noopener">{kammer.url.replace('https://', '')}</a>.
+          Gesetzestexte des Landes stehen unter
+          {' '}<a href="https://recht.nrw.de" class="link" rel="noopener">recht.nrw.de</a>,
+          die GOÄ beim Bundesministerium für Gesundheit.
+        </p>
+
+        <h2 class="h3">Berufshaftpflichtversicherung</h2>
+        {impressum.haftpflicht
+          ? <p>
+              {impressum.haftpflicht.versicherer}<br />
+              {impressum.haftpflicht.anschrift}<br />
+              Räumlicher Geltungsbereich: {impressum.haftpflicht.geltung}
+            </p>
+          : <p><span class="offen">Angabe noch offen</span> — Versicherer, Anschrift
+              und räumlicher Geltungsbereich werden nach § 2 DL-InfoV vor der
+              Veröffentlichung ergänzt.</p>}
+
+        <h2 class="h3">Umsatzsteuer</h2>
+        {impressum.ustId
+          ? <p>Umsatzsteuer-Identifikationsnummer: {impressum.ustId}</p>
+          : <p>
+              Ärztliche Heilbehandlungen sind nach § 4 Nr. 14 Buchstabe a
+              Umsatzsteuergesetz von der Umsatzsteuer befreit. Eine
+              Umsatzsteuer-Identifikationsnummer nach § 27 a UStG liegt derzeit
+              nicht vor. <span class="offen">Vor Veröffentlichung bestätigen</span>,
+              da ästhetische Leistungen der Umsatzsteuer unterliegen können.
+            </p>}
+
+        <h2 class="h3">Verbraucherstreitbeilegung</h2>
+        <p>
+          {site.nameShort} ist weder bereit noch verpflichtet, an
+          Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle
+          teilzunehmen (§ 36 Verbraucherstreitbeilegungsgesetz).
+        </p>
+        <p>
+          Bei Zweifeln an einer ärztlichen Behandlung steht unabhängig davon die
+          Gutachterkommission für ärztliche Behandlungsfehler bei der
+          {' '}{kammer.name} offen.
+        </p>
+
+        <h2 class="h3">Haftung für Inhalte und Verweise</h2>
+        <p>
+          Die Inhalte dieser Website werden mit Sorgfalt erstellt. Für ihre
+          Richtigkeit, Vollständigkeit und Aktualität kann keine Gewähr übernommen
+          werden. Die Texte sind allgemeine Information und ersetzen keine
+          ärztliche Untersuchung.
+        </p>
+        <p>
+          Diese Website verweist an einzelnen Stellen auf Websites Dritter, etwa
+          auf die Praxen, in denen {site.nameShort} tätig ist. Auf deren Inhalte
+          besteht kein Einfluss; verantwortlich sind allein die jeweiligen
+          Anbieter. Zum Zeitpunkt der Verlinkung waren keine Rechtsverstöße
+          erkennbar.
+        </p>
+
+        <h2 class="h3">Urheberrecht und Bilder</h2>
+        <p>
+          Texte, Bilder und Gestaltung dieser Website sind urheberrechtlich
+          geschützt. Eine Verwendung außerhalb der gesetzlich erlaubten Fälle
+          bedarf der vorherigen Zustimmung.
+        </p>
+        <p>
+          Die Bilder dieser Seite wurden mit Unterstützung künstlicher Intelligenz
+          erstellt. Grundlage der Portraits sind eigene Aufnahmen von
+          {' '}{site.name}.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .krumen { color: var(--text-muted); }
+  .krumen a { text-decoration: none; }
+  .krumen a:hover { color: var(--text-primary); }
+
+  .titel { margin-top: var(--s-6); max-width: 20ch; }
+  .text { margin-top: var(--s-16); }
+  .text :global(h2) { margin-top: var(--s-12); margin-bottom: var(--s-4); }
+  .text :global(h2:first-child) { margin-top: 0; }
+  .text :global(p), .text :global(li) { color: var(--text-secondary); }
+  /* base.css raeumt Listenpunkte global ab – hier tragen sie Bedeutung. */
+  .text :global(ul) { margin-top: var(--s-2); padding-left: var(--s-6); list-style: disc; }
+  .text :global(li) { margin-top: var(--s-1); }
+
+  /* Ein Nachsatz, der eine Angabe einordnet — leiser als der Absatz davor. */
+  .hinweis { font-size: var(--fs-small); }
+  .klein { font-size: var(--fs-small); color: var(--text-muted); }
+
+  /*
+   * Sichtbar offene Pflichtangabe. Das ist Absicht: Fehlt eine solche Angabe
+   * stillschweigend, fällt es beim Korrekturlesen niemandem auf.
+   */
+  .offen {
+    padding: 0.1em 0.4em;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-field);
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+</style>

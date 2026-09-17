@@ -1,5 +1,5 @@
 ---
-import { Picture } from 'astro:assets';
+import { getImage, Picture } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
 import Disclaimer from '../../components/Disclaimer.astro';
@@ -16,6 +16,45 @@ const { leistung } = Astro.props;
 const bild = schwerpunkte.find((s) => s.slug === leistung.slug)!;
 const bildZu = (slug: string) => schwerpunkte.find((s) => s.slug === slug)!;
 const andere = leistungenSortiert.filter((l) => l.slug !== leistung.slug);
+
+/*
+ * Art Direction im Hero: Auf dem Telefon steht das Bild quer über die volle
+ * Breite — das Hochformat müsste dort auf 4/3 beschnitten werden und verlöre
+ * seinen Aufbau. Ab 60rem füllt wieder das Hochformat die Spalte neben dem
+ * Text. Astros <Picture> kennt nur eine Quelle, kennt also keine Art
+ * Direction; deshalb ist <picture> hier handgebaut. Geladen wird trotzdem
+ * nur eine Datei.
+ *
+ * Die Breiten enden bei der Breite der Vorlage (quer 1536, hoch 1024) —
+ * darüber hinaus zu rechnen erzeugt größere Dateien ohne mehr Detail.
+ */
+const QUER_BREITEN = [540, 760, 1080, 1536];
+const HOCH_BREITEN = [420, 640, 1024];
+
+const bilderIn = (src: ImageMetadata, breiten: number[], format: 'avif' | 'webp') =>
+  Promise.all(
+    breiten.map((width) =>
+      getImage({ src, width, format, quality: format === 'avif' ? 74 : 76 })
+    )
+  );
+
+const querAvif = await bilderIn(bild.bildQuer, QUER_BREITEN, 'avif');
+const querWebp = await bilderIn(bild.bildQuer, QUER_BREITEN, 'webp');
+const hochAvif = await bilderIn(bild.bild, HOCH_BREITEN, 'avif');
+const hochWebp = await bilderIn(bild.bild, HOCH_BREITEN, 'webp');
+/* Letzte Rückfallebene für Browser ohne AVIF und WebP — bewusst klein. */
+const heroFallback = await getImage({
+  src: bild.bild,
+  width: 1024,
+  format: 'jpeg',
+  quality: 76,
+});
+
+const srcset = (bilder: { src: string }[], breiten: number[]) =>
+  bilder.map((b, i) => `${b.src} ${breiten[i]}w`).join(', ');
+
+const SCHMAL = '(max-width: 59.999rem)';
+const BREIT = '(min-width: 60rem)';
 
 /** Datum der letzten fachlichen Prüfung. Beim Freigeben setzen. */
 const geprueft = '2026-09-17';
@@ -79,19 +118,22 @@ const schema = [
         </div>
 
         <div class="hero__media">
-          <Picture
-            src={bild.bild}
-            alt={bild.bildAlt}
-            widths={[540, 760, 1080, 1400]}
-            sizes="(min-width: 60rem) 44vw, 100vw"
-            formats={['avif', 'webp']}
-            fallbackFormat="jpeg"
-            quality={74}
-            loading="eager"
-            fetchpriority="high"
-            pictureAttributes={{ class: 'hero__pic' }}
-            class="hero__img"
-          />
+          <picture class="hero__pic">
+            <source media={SCHMAL} type="image/avif" srcset={srcset(querAvif, QUER_BREITEN)} sizes="100vw" />
+            <source media={SCHMAL} type="image/webp" srcset={srcset(querWebp, QUER_BREITEN)} sizes="100vw" />
+            <source media={BREIT} type="image/avif" srcset={srcset(hochAvif, HOCH_BREITEN)} sizes="44vw" />
+            <source media={BREIT} type="image/webp" srcset={srcset(hochWebp, HOCH_BREITEN)} sizes="44vw" />
+            <img
+              src={heroFallback.src}
+              alt={bild.bildAlt}
+              width={1024}
+              height={1536}
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              class="hero__img"
+            />
+          </picture>
         </div>
       </div>
     </header>
@@ -250,16 +292,23 @@ const schema = [
   .hero__lead { margin-top: var(--s-8); max-width: 36rem; color: var(--text-secondary); }
 
   /* --- Bild: erst die schmale Fassung, dann der Desktop-Fall ---------- */
-  .hero :global(.hero__pic) { display: block; }
+  .hero__pic { display: block; }
   .hero__img {
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 2;
     object-fit: cover;
     object-position: 50% 24%;
   }
   @media (max-width: 59.999rem) {
     .hero__media { margin-inline: calc(var(--gutter) * -1); }
+    /*
+     * Das Querformat trägt hier: 3 / 2 ist das Verhältnis der Vorlage
+     * (1536 × 1024), deshalb wird nichts beschnitten und der Bildaufbau
+     * bleibt, wie er fotografiert wurde. Die Verschiebung nach oben gilt
+     * nur dem Hochformat auf dem Desktop.
+     */
+    .hero__img { object-position: 50% 50%; }
   }
 
   @media (min-width: 60rem) {
@@ -293,7 +342,7 @@ const schema = [
       margin-right: calc(var(--gutter) * -1);
       margin-inline-start: 0;
     }
-    .hero :global(.hero__pic) { position: absolute; inset: 0; }
+    .hero__pic { position: absolute; inset: 0; }
     .hero__img { height: 100%; aspect-ratio: auto; }
   }
 

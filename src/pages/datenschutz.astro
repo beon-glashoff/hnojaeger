@@ -1,0 +1,208 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site, kontakt, aufsichtsbehoerde, hosting } from '../data/site';
+
+/**
+ * Datenschutzerklärung. Grundlage: 05_Recht-und-Datenschutz.md, Abschnitt 6.
+ *
+ * Die Seite kann so kurz sein, weil die Architektur datenarm ist: kein
+ * Kontaktformular, keine Reichweitenmessung, keine externen Schriften, Karten
+ * oder Videos, keine Cookies. Beschrieben wird deshalb nur, was tatsächlich
+ * passiert — jede Zeile hier hat eine Entsprechung im Build.
+ *
+ * Wer hier etwas ergänzt, muss zuerst prüfen, ob die Beschreibung noch stimmt:
+ * Kommt eine Reichweitenmessung oder ein Terminlink dazu, gehört ein eigener
+ * Abschnitt her.
+ *
+ * ENTWURF – vor dem Go-live anwaltlich prüfen lassen.
+ */
+const anschrift = kontakt.anschrift;
+const stand = '17. September 2026';
+---
+
+<BaseLayout
+  variant="dunkel"
+  modeToggle
+  noindex
+  title={`Datenschutz – ${site.nameShort}`}
+  description="Wie diese Website mit personenbezogenen Daten umgeht."
+>
+  <section class="section">
+    <div class="container">
+      <nav class="krumen small" aria-label="Brotkrumen"><a href="/">Start</a></nav>
+
+      <h1 class="display titel">Datenschutz</h1>
+
+      <p class="lead vorspann">
+        Diese Website ist so gebaut, dass beim Lesen so wenig Daten anfallen wie
+        möglich: keine Cookies, keine Reichweitenmessung, keine Inhalte von
+        fremden Servern. Was dennoch verarbeitet wird, steht hier vollständig.
+      </p>
+
+      <div class="text prose">
+        <h2 class="h3">Verantwortliche</h2>
+        <p>
+          {site.name}<br />
+          {site.role}<br />
+          {anschrift.strasse}, {anschrift.plz} {anschrift.ort}<br />
+          E-Mail: <a href={`mailto:${kontakt.email}`} class="link">{kontakt.email}</a><br />
+          Telefon: <a href={`tel:${kontakt.telefonHref}`} class="link">{kontakt.telefon}</a>
+        </p>
+        <p class="hinweis">
+          Eine Datenschutzbeauftragte ist nicht zu benennen; die Voraussetzungen
+          des § 38 Bundesdatenschutzgesetz liegen nicht vor.
+        </p>
+
+        <h2 class="h3">Keine Cookies, keine Reichweitenmessung</h2>
+        <p>
+          Diese Website setzt <strong>keine Cookies</strong>. Es findet keine
+          Reichweitenmessung statt, es gibt kein Tracking, kein Profiling und
+          keine Weitergabe von Daten zu Werbezwecken. Ein Einwilligungsbanner ist
+          deshalb nicht erforderlich — es gibt nichts einzuwilligen.
+        </p>
+        <p>
+          Alle Schriften, Bilder und Skripte liegen auf demselben Server wie die
+          Seite selbst. Es werden keine Google Fonts, keine Karten, keine Videos
+          und keine Skripte Dritter nachgeladen. Ihr Browser baut beim Aufruf
+          dieser Seite zu keinem fremden Anbieter eine Verbindung auf.
+        </p>
+
+        <h2 class="h3">Was Ihr Browser lokal speichert</h2>
+        <p>
+          Eine einzige Angabe wird auf Ihrem Gerät gespeichert: ob Sie die Seite
+          hell oder dunkel lesen möchten. Sie wird im lokalen Speicher Ihres
+          Browsers abgelegt (Eintrag <code>hnoj-mode</code>), sobald Sie den
+          Umschalter benutzen. Diese Angabe verlässt Ihr Gerät nicht, wird nicht
+          übertragen und enthält keinen Personenbezug. Sie dient allein der von
+          Ihnen selbst gewünschten Darstellung (§ 25 Abs. 2 Nr. 2 TDDDG). Sie
+          können sie jederzeit über die Einstellungen Ihres Browsers löschen.
+        </p>
+
+        <h2 class="h3">Aufruf der Website, Serverprotokolle</h2>
+        <p>
+          Beim Aufruf einer Seite übermittelt Ihr Browser technisch notwendige
+          Angaben an den Server: IP-Adresse, Datum und Uhrzeit, die abgerufene
+          Adresse, den übertragenen Umfang, die Meldung über den Erfolg des
+          Abrufs sowie Browser- und Betriebssystemkennung. Diese Angaben sind
+          nötig, damit die Seite ausgeliefert werden kann, und dienen darüber
+          hinaus der Sicherheit und Stabilität des Betriebs.
+        </p>
+        <p>
+          Rechtsgrundlage ist Artikel 6 Absatz 1 Buchstabe f DSGVO. Das
+          berechtigte Interesse liegt im sicheren und fehlerfreien Betrieb der
+          Website. Die Protokolle werden nicht mit anderen Daten zusammengeführt,
+          nicht ausgewertet, um einzelne Personen wiederzuerkennen, und nach
+          kurzer Zeit gelöscht.
+        </p>
+
+        <h2 class="h3">Hosting</h2>
+        <p>
+          Die Website wird bei {hosting.anbieter}, {hosting.anschrift}, betrieben.
+          Der Anbieter verarbeitet die oben genannten Zugriffsdaten
+          ausschließlich weisungsgebunden zum Zweck der Auslieferung. Grundlage
+          ist ein Vertrag zur Auftragsverarbeitung nach Artikel 28 DSGVO.
+        </p>
+        <p class="hinweis">
+          Hinweise des Anbieters zum Datenschutz:
+          {' '}<a href={hosting.url} class="link" rel="noopener">cloudflare.com</a>
+        </p>
+
+        <h2 class="h3">Kontakt per E-Mail oder Telefon</h2>
+        <p>
+          Ein Kontaktformular gibt es auf dieser Website bewusst nicht. Wenn Sie
+          Kontakt aufnehmen möchten, geht das per E-Mail oder telefonisch. Die
+          dabei mitgeteilten Angaben — Name, E-Mail-Adresse oder Rufnummer und
+          der Inhalt Ihrer Nachricht — werden allein verwendet, um Ihr Anliegen
+          zu bearbeiten. Rechtsgrundlage ist Artikel 6 Absatz 1 Buchstabe b
+          DSGVO, soweit es um die Anbahnung eines Behandlungsverhältnisses geht,
+          im Übrigen Artikel 6 Absatz 1 Buchstabe f DSGVO.
+        </p>
+        <p>
+          Die Nachrichten werden gelöscht, sobald das Anliegen erledigt ist und
+          keine gesetzliche Aufbewahrungspflicht entgegensteht.
+        </p>
+        <p class="kasten">
+          <strong>Bitte senden Sie keine Angaben zu Ihrer Gesundheit per E-Mail.</strong>
+          {' '}E-Mail ist kein gesicherter Übertragungsweg, und Gesundheitsdaten
+          genießen nach Artikel 9 DSGVO besonderen Schutz. Was Ihre Beschwerden
+          betrifft, besprechen Sie bitte persönlich in der Sprechstunde. Eine
+          Beratung über diese Website ist nicht möglich —
+          {' '}<a href="/gesundheitsinformationen/" class="link">warum, steht hier</a>.
+        </p>
+
+        <h2 class="h3">Verweise auf andere Websites</h2>
+        <p>
+          Diese Website verlinkt die Praxen, in denen {site.nameShort} tätig ist.
+          Beim Anklicken eines solchen Verweises verlassen Sie diese Seite; ab
+          dann gilt die Datenschutzerklärung des jeweiligen Anbieters. Eingebunden
+          werden fremde Inhalte an keiner Stelle — es werden also erst dann Daten
+          übertragen, wenn Sie einen Verweis bewusst anklicken.
+        </p>
+
+        <h2 class="h3">Ihre Rechte</h2>
+        <p>Sie haben jederzeit das Recht auf</p>
+        <ul>
+          <li>Auskunft über die zu Ihnen verarbeiteten Daten (Artikel 15 DSGVO)</li>
+          <li>Berichtigung unrichtiger Daten (Artikel 16 DSGVO)</li>
+          <li>Löschung (Artikel 17 DSGVO)</li>
+          <li>Einschränkung der Verarbeitung (Artikel 18 DSGVO)</li>
+          <li>Datenübertragbarkeit (Artikel 20 DSGVO)</li>
+          <li>Widerspruch gegen eine Verarbeitung nach Artikel 6 Absatz 1 Buchstabe f (Artikel 21 DSGVO)</li>
+        </ul>
+        <p>
+          Wenden Sie sich dafür formlos an
+          {' '}<a href={`mailto:${kontakt.email}`} class="link">{kontakt.email}</a>.
+        </p>
+        <p>
+          Unabhängig davon steht Ihnen ein Beschwerderecht bei einer
+          Datenschutz-Aufsichtsbehörde zu (Artikel 77 DSGVO). Zuständig ist die
+          {' '}{aufsichtsbehoerde.name}, {aufsichtsbehoerde.strasse},
+          {' '}{aufsichtsbehoerde.plz} {aufsichtsbehoerde.ort},
+          {' '}<a href={aufsichtsbehoerde.url} class="link" rel="noopener">
+            {aufsichtsbehoerde.url.replace('https://', '')}</a>.
+        </p>
+
+        <h2 class="h3">Änderungen</h2>
+        <p>
+          Diese Erklärung wird angepasst, sobald sich an der Website etwas ändert,
+          das für den Datenschutz erheblich ist. Stand: {stand}.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .krumen { color: var(--text-muted); }
+  .krumen a { text-decoration: none; }
+  .krumen a:hover { color: var(--text-primary); }
+
+  .titel { margin-top: var(--s-6); max-width: 20ch; }
+  .vorspann { margin-top: var(--s-8); max-width: 42rem; color: var(--text-secondary); }
+  .text { margin-top: var(--s-16); }
+  .text :global(h2) { margin-top: var(--s-12); margin-bottom: var(--s-4); }
+  .text :global(h2:first-child) { margin-top: 0; }
+  .text :global(p), .text :global(li) { color: var(--text-secondary); }
+  /* base.css raeumt Listenpunkte global ab – hier tragen sie Bedeutung. */
+  .text :global(ul) { margin-top: var(--s-2); padding-left: var(--s-6); list-style: disc; }
+  .text :global(li) { margin-top: var(--s-1); }
+  .text :global(code) {
+    font-size: 0.9em;
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius-field);
+    background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  }
+
+  .hinweis { font-size: var(--fs-small); }
+
+  /*
+   * Der einzige hervorgehobene Absatz der Seite. Er steht dort, wo jemand über
+   * eine E-Mail nachdenkt — nicht am Ende, wo ihn niemand mehr liest.
+   */
+  .kasten {
+    margin-top: var(--s-6);
+    padding: var(--s-6);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+  }
+</style>

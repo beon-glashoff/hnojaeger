@@ -120,7 +120,7 @@ const DESKTOP = '(min-width: 48rem)';
       {/* Diese Sektion war als einzige ohne Überschrift – im Dokumentumriss
           eine Lücke zwischen H1 und den folgenden H2. */}
       <p class="label reveal">Schwerpunkte</p>
-      <h2 class="h2 sec__title reveal">Vier Bereiche, in denen ich in die Tiefe gehe</h2>
+      <h2 class="h2 sec__title reveal">Vier Bereiche, die genaueres Hinsehen verlangen</h2>
 
       <ul class="rows reveal">
         {schwerpunkte.map((s) => (
@@ -341,27 +341,39 @@ const DESKTOP = '(min-width: 48rem)';
   }
 
   @media (min-width: 60rem) {
-    .hero { align-items: center; }
     .hero__img { object-position: 30% 26%; }   /* Querformat: sie steht links */
     /*
-     * Kein durchgehender Scrim mehr: Der Verlauf kommt aus der rechten
-     * oberen Ecke (trägt Navigation und Textspalte) und mit einem kleinen
-     * Kegel aus der linken oberen Ecke (trägt die Wortmarke). Dazwischen –
-     * über ihrem Kopf – bleibt das Motiv unangetastet.
+     * Kein Verlauf über die ganze Breite, sondern drei Kegel aus den Ecken.
+     * Zusammen ergeben sie ein helles Feld, das um sie herum liegt und nach
+     * außen dunkler wird — links unten läuft es offen aus, dort trägt das
+     * einfallende Licht das Bild und soll es weiter tun.
+     *
+     * Die Deckkraft ist gegen die hellste Bildstelle der jeweiligen Ecke
+     * gerechnet, nicht nach Augenmaß.
      */
     .hero__veil {
       background:
-        linear-gradient(
-          to left,
-          rgba(34, 38, 42, 0.92) 0%,
-          rgba(34, 38, 42, 0.86) 32%,
-          rgba(34, 38, 42, 0.32) 56%,
-          rgba(34, 38, 42, 0) 78%
-        ),
+        /* Rechts unten: trägt Name, Rolle und Vorspann. Der Kegel hält seine
+           Deckkraft bis 50 % des Radius, damit die ganze Textspalte auf
+           demselben Grund steht und nicht die letzte Zeile heller wird.
+           Gemessen über der Textfläche: Name 10,0:1, Vorspann 7,4:1. Bei
+           42 % fiel der Vorspann auf 5,5:1 — das trägt, ist aber weniger,
+           als die Seite sonst hält. Weiter aufgezogen (56 % und mehr)
+           steigt die Deckkraft links unten spürbar an; dort soll das
+           einfallende Licht stehen bleiben. */
         radial-gradient(
-          58% 40% at 100% 0%,
-          rgba(34, 38, 42, 0.82) 0%,
-          rgba(34, 38, 42, 0.42) 46%,
+          85% 95% at 100% 100%,
+          rgba(34, 38, 42, 0.93) 0%,
+          rgba(34, 38, 42, 0.90) 50%,
+          rgba(34, 38, 42, 0.54) 72%,
+          rgba(34, 38, 42, 0.18) 88%,
+          rgba(34, 38, 42, 0) 100%
+        ),
+        /* Rechts oben: trägt die Navigation. */
+        radial-gradient(
+          58% 44% at 100% 0%,
+          rgba(34, 38, 42, 0.84) 0%,
+          rgba(34, 38, 42, 0.46) 46%,
           rgba(34, 38, 42, 0) 76%
         ),
         /* Hinter der Wortmarke liegt ein Fenster – gemessen der hellste
@@ -385,6 +397,12 @@ const DESKTOP = '(min-width: 48rem)';
   }
   @media (min-width: 60rem) {
     .hero__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 32rem); }
+    /*
+     * Rechts unten statt rechts mittig: Der Name sitzt damit im dunkelsten
+     * Teil des Bildes, und über ihm bleibt der Raum frei, in dem sie steht.
+     * Das `align-items: end` des Hero gilt hier ohnehin — auf dem Desktop
+     * stand es früher auf `center`.
+     */
     .hero__text { grid-column: 2; }
   }
 

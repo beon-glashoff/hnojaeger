@@ -8,6 +8,12 @@ import schlafmedizinBild from '../assets/images/schwerpunkte/schlafmedizin.png';
 import allergologieBild from '../assets/images/schwerpunkte/allergologie.png';
 import kinderHnoBild from '../assets/images/schwerpunkte/kinder-hno.png';
 import aesthetikBild from '../assets/images/schwerpunkte/aesthetische-medizin.png';
+/* Querformate derselben Motive, eigens fotografiert statt beschnitten —
+   auf dem Telefon steht der Hero der Leistungsseiten quer. */
+import schlafmedizinQuer from '../assets/images/schwerpunkte/quer/schlafmedizin.png';
+import allergologieQuer from '../assets/images/schwerpunkte/quer/allergologie.png';
+import kinderHnoQuer from '../assets/images/schwerpunkte/quer/kinder-hno.png';
+import aesthetikQuer from '../assets/images/schwerpunkte/quer/aesthetische-medizin.png';
 
 export interface Schwerpunkt {
   slug: string;
@@ -18,7 +24,13 @@ export interface Schwerpunkt {
   /** Kurzfassung für Layouts mit schmalen Spalten (Variante C). */
   kurztext: string;
   bild: ImageMetadata;
-  /** Beschreibt, was zu sehen ist — nicht das Thema. Die Bilder tragen Inhalt. */
+  /**
+   * Dasselbe Motiv im Querformat. Der Hero der Leistungsseiten zeigt es auf
+   * schmalen Bildschirmen; das Hochformat müsste dort auf 4/3 beschnitten
+   * werden und verlöre den Bildaufbau.
+   */
+  bildQuer: ImageMetadata;
+  /** Beschreibt, was zu sehen ist — nicht das Thema. Gilt für beide Formate. */
   bildAlt: string;
 }
 
@@ -29,6 +41,7 @@ export const schwerpunkte: Schwerpunkt[] = [
     titel: 'Schlafmedizin',
     kurz: 'Schnarchen und Schlafapnoe',
     bild: schlafmedizinBild,
+    bildQuer: schlafmedizinQuer,
     bildAlt: 'Schlafender Mann in einem hellen Schlafzimmer',
     text: 'Schnarchen ist selten nur ein Geräusch. Dahinter können Atemaussetzer stehen, die den Schlaf zerstückeln und den Kreislauf belasten. Ich arbeite täglich in einer schlafmedizinischen Schwerpunktpraxis und gehe der Ursache nach – von der Nasenatmung bis zur nächtlichen Messung.',
     kurztext: 'Schnarchen ist selten nur ein Geräusch. Dahinter können Atemaussetzer stehen – abgeklärt von der Nasenatmung bis zur nächtlichen Messung.',
@@ -39,6 +52,7 @@ export const schwerpunkte: Schwerpunkt[] = [
     titel: 'Allergologie',
     kurz: 'Diagnostik und Therapie',
     bild: allergologieBild,
+    bildQuer: allergologieQuer,
     bildAlt: 'Frau im Freien, die mit geschlossenen Augen tief durchatmet',
     text: 'Die Zusatzbezeichnung Allergologie führe ich seit 2014. Eine gute Allergiediagnostik beantwortet nicht nur die Frage, worauf jemand reagiert, sondern auch, was sich dagegen tun lässt – von der Karenz über die Medikation bis zur Hyposensibilisierung.',
     kurztext: 'Welche Allergie dahintersteckt und was sich dagegen tun lässt – von der Karenz über die Medikation bis zur Hyposensibilisierung.',
@@ -49,6 +63,7 @@ export const schwerpunkte: Schwerpunkt[] = [
     titel: 'Kinder-HNO',
     kurz: 'Hören, Infekte, Paukenröhrchen',
     bild: kinderHnoBild,
+    bildQuer: kinderHnoQuer,
     bildAlt: 'Junge mit Kopfhörern sitzt auf einem Sofa und hört zu',
     text: 'Kinder sagen nicht, dass sie schlecht hören – sie fallen auf, weil sie nicht zuhören. Bei wiederkehrenden Infekten, Paukenergüssen und Hörauffälligkeiten nehme ich mir die Zeit, die eine Untersuchung mit Kindern braucht.',
     kurztext: 'Kinder sagen nicht, dass sie schlecht hören – sie fallen auf, weil sie nicht zuhören. Abklärung mit der Ruhe, die Kinder brauchen.',
@@ -59,6 +74,7 @@ export const schwerpunkte: Schwerpunkt[] = [
     titel: 'Ästhetische Medizin',
     kurz: 'Faltenbehandlung mit Botulinumtoxin',
     bild: aesthetikBild,
+    bildQuer: aesthetikQuer,
     bildAlt: 'Ärztin behandelt die Stirnpartie einer Patientin',
     text: 'Die Gesichtsanatomie kenne ich aus der HNO-Ausbildung, nicht aus einer Wochenendschulung. Das ist der Unterschied, auf den es bei einer Faltenbehandlung mit Botulinumtoxin ankommt – zurückhaltend dosiert und mit realistischer Erwartung.',
     kurztext: 'Faltenbehandlung mit Botulinumtoxin aus fachärztlicher Hand – zurückhaltend dosiert, mit realistischer Erwartung.',

@@ -1,0 +1,336 @@
+---
+import { site } from '../data/site';
+import { logoInline } from '../lib/logo';
+import Icon from './Icon.astro';
+import wortmarke from '../assets/logos/wortmarke-fa-anthrazit.svg?raw';
+
+interface Props {
+  /**
+   * Legt den Header über einen Vollbild-Hero: transparent, fixiert,
+   * und erst beim Scrollen hinterlegt. Ohne diese Angabe steht der
+   * Header wie bisher statisch im Fluss.
+   */
+  overlay?: boolean;
+  /** Zeigt den Umschalter zwischen dunkler und heller Ansicht. */
+  modeToggle?: boolean;
+}
+
+const { overlay = false, modeToggle = false } = Astro.props;
+
+// Absolute Ziele: Von den Leistungsseiten aus müssen die Sprungmarken
+// zurück auf die Startseite führen, nicht ins Leere.
+const nav = [
+  { href: '/#schwerpunkte', text: 'Schwerpunkte' },
+  { href: '/#vita', text: 'Vita' },
+  { href: '/#sprechstunden', text: 'Sprechstunden' },
+];
+
+// Wortmarke inline: skaliert scharf, kein zusätzlicher Request,
+// folgt über currentColor dem jeweiligen Theme
+const logo = logoInline(wortmarke, { label: `${site.nameShort}, ${site.roleShort}` });
+---
+
+<header class:list={['site-header', overlay && 'site-header--overlay']} data-overlay={overlay ? '' : null}>
+  <div class="container container--wide site-header__inner">
+    <a href="/" class="site-header__logo" aria-label="Startseite">
+      <Fragment set:html={logo} />
+    </a>
+
+    <div class="site-header__controls">
+      <nav id="hauptnavigation" aria-label="Hauptnavigation" class="site-header__navwrap">
+        <ul class="site-header__nav">
+          {nav.map((item) => (
+            <li><a href={item.href}>{item.text}</a></li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* Steht in der Leiste, nicht im Panel: So ist der Umschalter auch
+          auf dem Telefon jederzeit erreichbar, ohne das Menü zu öffnen. */}
+      {modeToggle && (
+        <button type="button" class="mode-toggle" data-mode-toggle>
+          <Icon name="sun" class="mode-toggle__icon mode-toggle__icon--sun" />
+          <Icon name="moon" class="mode-toggle__icon mode-toggle__icon--moon" />
+          <span class="visually-hidden" data-mode-label>Zur hellen Ansicht wechseln</span>
+        </button>
+      )}
+
+      <button
+        type="button"
+        class="burger"
+        data-nav-toggle
+        aria-expanded="false"
+        aria-controls="hauptnavigation"
+      >
+        <Icon name="menu" class="burger__icon burger__icon--open" />
+        <Icon name="x" class="burger__icon burger__icon--close" />
+        <span class="visually-hidden" data-nav-label>Menü öffnen</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+{overlay && (
+  <script>
+    // Der Header wird hinterlegt, sobald der Hero oben herausgescrollt ist.
+    // Ein Sentinel statt eines Scroll-Listeners: kein Layout-Thrashing.
+    const header = document.querySelector('.site-header--overlay');
+    if (header) {
+      // Der Sentinel ist so hoch wie die Strecke, nach der hinterlegt werden
+      // soll. Er verlässt den Viewport genau dann — ohne rootMargin-Rechnerei,
+      // die bei Scrollposition 0 sonst fälschlich auslöst.
+      const sentinel = document.createElement('div');
+      sentinel.setAttribute('aria-hidden', 'true');
+      sentinel.style.cssText =
+        'position:absolute;top:0;left:0;width:1px;height:56px;pointer-events:none;';
+      document.body.prepend(sentinel);
+
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(
+          ([entry]) => header.classList.toggle('is-stuck', !entry.isIntersecting),
+          { threshold: 0 }
+        ).observe(sentinel);
+      } else {
+        header.classList.add('is-stuck');
+      }
+    }
+  </script>
+)}
+
+<script>
+  // Klappmenü unterhalb 48rem. Der Header bleibt dadurch einzeilig und
+  // niedrig; darüber läuft die Navigation wie bisher in einer Reihe.
+  {
+    const header = document.querySelector('.site-header');
+    const toggle = header?.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+    const label = toggle?.querySelector('[data-nav-label]');
+
+    if (header && toggle) {
+      const setOpen = (open: boolean) => {
+        header.classList.toggle('is-open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        const text = open ? 'Menü schließen' : 'Menü öffnen';
+        toggle.setAttribute('aria-label', text);
+        if (label) label.textContent = text;
+      };
+
+      setOpen(false);
+      toggle.addEventListener('click', () => setOpen(!header.classList.contains('is-open')));
+
+      // Nach einem Sprung zu einem Abschnitt soll das Menü nicht offen bleiben.
+      header.querySelectorAll('.site-header__nav a').forEach((a) =>
+        a.addEventListener('click', () => setOpen(false))
+      );
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && header.classList.contains('is-open')) {
+          setOpen(false);
+          toggle.focus();
+        }
+      });
+    }
+  }
+</script>
+
+<style>
+  .site-header {
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-primary);
+  }
+
+  /* Immer einzeilig: Logo links, Bedienelemente rechts – auch auf dem
+     Telefon. Vorher rutschte beides in die Mitte und der Header wurde
+     dadurch doppelt so hoch. */
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    min-height: var(--header-h);
+    padding-block: var(--s-4);
+  }
+
+  /* Wortmarke: Höhe steuert die Größe, das SVG bringt sein eigenes Seitenverhältnis mit */
+  .site-header__logo :global(svg) {
+    height: 2.25rem;
+    width: auto;
+  }
+
+  .site-header__nav {
+    display: flex;
+    gap: clamp(var(--s-4), 2.5vw, var(--s-8));
+    font-size: var(--fs-small);
+  }
+
+  .site-header__nav a {
+    text-decoration: none;
+    color: var(--text-secondary);
+    padding-block: var(--s-2);
+    border-bottom: 1px solid transparent;
+    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  }
+
+  .site-header__nav a:hover {
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+
+  /* ------------------------------------------------ Modus-Umschalter */
+  /* Bewusst nur ein Icon, keine Beschriftung und kein Rahmen – er soll
+     im Menü mitlaufen, nicht darin auffallen. */
+  .mode-toggle {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin: -0.5rem -0.5rem -0.5rem 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color var(--dur) var(--ease);
+  }
+  .mode-toggle:hover { color: var(--text-primary); }
+  .mode-toggle :global(.icon) { width: 1.125rem; height: 1.125rem; }
+
+  /*
+   * Gezeigt wird das Ziel, nicht der Zustand: im Dunkeln die Sonne.
+   * :global() ist nötig, weil die SVGs aus Icon.astro per set:html
+   * eingesetzt werden und deshalb kein Scope-Attribut dieser Komponente
+   * tragen — eine gekapselte Klassenregel greift dort nicht.
+   */
+  .mode-toggle :global(.mode-toggle__icon) { grid-area: 1 / 1; }
+  .mode-toggle :global(.mode-toggle__icon--moon) { display: none; }
+  :global(:root[data-mode='light']) .mode-toggle :global(.mode-toggle__icon--sun) { display: none; }
+  :global(:root[data-mode='light']) .mode-toggle :global(.mode-toggle__icon--moon) { display: block; }
+
+  /* ------------------------------------------------ Klappmenü (Mobil) */
+  .site-header__controls { display: flex; align-items: center; gap: var(--s-4); }
+
+  /* Zwei Striche statt drei: kleineres, ruhigeres Zeichen. */
+  .burger {
+    display: none;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: -0.625rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+  .burger :global(.icon) { width: 1.375rem; height: 1.375rem; }
+  .burger :global(.burger__icon) { grid-area: 1 / 1; }
+  .burger :global(.burger__icon--close) { display: none; }
+
+  @media (max-width: 47.999rem) {
+    .site-header { --header-h: 4rem; }
+    .site-header__inner { min-height: 4rem; padding-block: var(--s-3); }
+    /* Auf dem Telefon ist die Leiste niedriger – der Hero rechnet mit. */
+    .site-header__logo :global(svg) { height: 1.75rem; }
+
+    .burger { display: grid; }
+    .site-header.is-open .burger :global(.burger__icon--open) { display: none; }
+    .site-header.is-open .burger :global(.burger__icon--close) { display: block; }
+
+    /* Das Panel hängt unter dem Header und übernimmt dessen Fläche. */
+    .site-header__navwrap {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      display: none;
+      padding: var(--s-4) var(--gutter) var(--s-6);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .site-header.is-open .site-header__navwrap { display: block; }
+
+    /* Feiner Strich über dem ersten Eintrag, exakt auf Inhaltsbreite –
+       er trennt das Panel von der Kopfleiste. */
+    .site-header__nav {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      font-size: var(--fs-body);
+      padding-top: var(--s-2);
+      border-top: 1px solid var(--border);
+    }
+    .site-header__nav a { display: block; padding-block: var(--s-3); }
+
+    /* Im Panel liegen die Links auf der Panel-Fläche, nicht über dem Bild –
+       sie folgen deshalb wieder den Token. */
+    .site-header--overlay .site-header__navwrap .site-header__nav a {
+      color: var(--text-secondary);
+    }
+
+    .mode-toggle { margin-right: 0; }
+  }
+
+  /* ------------------------------------------------- Overlay-Zustand */
+  .site-header--overlay {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    background: transparent;
+    border-bottom-color: transparent;
+    color: var(--text-primary);
+    transition: background var(--dur) var(--ease),
+                border-color var(--dur) var(--ease),
+                backdrop-filter var(--dur) var(--ease);
+  }
+
+  /*
+   * Über dem Bild tragen die Links den vollen Textton, nicht den
+   * Sekundärton — nur so hält der Kontrast über dem Scrim (5,96:1
+   * im ungünstigsten Fall, gemessen gegen Weiß im Bild).
+   * Der Ton ist fest und folgt NICHT dem Farbmodus: Der Hero liegt in
+   * beiden Modi auf einem dunklen Verlauf über dem Foto.
+   */
+  .site-header--overlay { color: #E7E7E3; }
+  .site-header--overlay .site-header__nav a,
+  .site-header--overlay .mode-toggle,
+  .site-header--overlay .burger { color: #E7E7E3; }
+
+  .site-header--overlay.is-stuck {
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter: blur(12px) saturate(120%);
+    border-bottom-color: var(--border);
+  }
+
+  /* Bei geöffnetem Menü übernimmt die Kopfleiste die Fläche des Panels –
+     sonst stünde eine transparente Leiste über einer deckenden Klappe. */
+  .site-header--overlay.is-open {
+    background: var(--surface);
+    backdrop-filter: none;
+    border-bottom-color: transparent;
+  }
+
+  .site-header--overlay.is-stuck,
+  .site-header--overlay.is-open { color: var(--text-primary); }
+
+  .site-header--overlay.is-stuck .site-header__nav a,
+  .site-header--overlay.is-stuck .mode-toggle,
+  .site-header--overlay.is-stuck .burger,
+  .site-header--overlay.is-open .site-header__nav a,
+  .site-header--overlay.is-open .mode-toggle,
+  .site-header--overlay.is-open .burger { color: var(--text-secondary); }
+
+  .site-header--overlay.is-stuck .site-header__nav a:hover,
+  .site-header--overlay.is-stuck .mode-toggle:hover,
+  .site-header--overlay.is-open .site-header__nav a:hover,
+  .site-header--overlay.is-open .mode-toggle:hover { color: var(--text-primary); }
+
+  /* Ohne backdrop-filter-Unterstützung: deckende Fläche statt Transparenz */
+  @supports not (backdrop-filter: blur(1px)) {
+    .site-header--overlay.is-stuck { background: var(--surface); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-header--overlay { transition: none; }
+  }
+</style>

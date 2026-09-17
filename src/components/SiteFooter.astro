@@ -1,0 +1,145 @@
+---
+import { site, kontakt, kammer } from '../data/site';
+import { logoInline } from '../lib/logo';
+import rundlogo from '../assets/logos/rundlogo-fa-light-sage.svg?raw';
+
+const jahr = new Date().getFullYear();
+
+const logo = logoInline(rundlogo, { hidden: true });
+
+const rechtliches = [
+  { href: '/impressum/', text: 'Impressum' },
+  { href: '/datenschutz/', text: 'Datenschutz' },
+  { href: '/gesundheitsinformationen/', text: 'Gesundheitsinformationen' },
+];
+---
+
+<footer class="site-footer">
+  <div class="container container--wide">
+    <div class="site-footer__grid">
+      <div class="site-footer__mark">
+        <Fragment set:html={logo} />
+      </div>
+
+      <div class="site-footer__col">
+        <p class="label site-footer__label">Kontakt</p>
+        <ul class="site-footer__list small">
+          <li>
+            <a href={`mailto:${kontakt.email}`} class="site-footer__link">{kontakt.email}</a>
+          </li>
+          <li>
+            <a href={`tel:${kontakt.telefonHref}`} class="site-footer__link">{kontakt.telefon}</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="site-footer__col">
+        <p class="label site-footer__label">Kammer</p>
+        <p class="small site-footer__text">
+          Mitglied der<br />
+          <a href={kammer.url} class="site-footer__link" rel="noopener">{kammer.name}</a>
+        </p>
+      </div>
+
+      <div class="site-footer__col">
+        <p class="label site-footer__label">Rechtliches</p>
+        <ul class="site-footer__list small">
+          {rechtliches.map((item) => (
+            <li><a href={item.href} class="site-footer__link">{item.text}</a></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <hr class="site-footer__rule" />
+
+    <div class="site-footer__meta small">
+      <p>© {jahr} {site.name} · {site.roleLong}</p>
+      {/* Transparenzhinweis: Sämtliche Fotos der Seite sind KI-generiert.
+          Bewusst auf Bilder eingegrenzt – ein pauschales „Inhalte" würde auf
+          einer Arztseite die Frage aufwerfen, ob auch die medizinischen Texte
+          so entstanden sind. Sie sind es nicht. */}
+      <p class="site-footer__ai">
+        Die Bilder dieser Seite wurden mit Unterstützung künstlicher Intelligenz erstellt.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--surface-dark);
+    color: var(--text-on-dark);
+    padding-block: var(--s-24) var(--s-12);
+  }
+
+  .site-footer__grid {
+    display: grid;
+    gap: var(--s-12);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 40rem) {
+    .site-footer__grid { grid-template-columns: repeat(2, 1fr); gap: var(--s-12) var(--s-8); }
+  }
+
+  /* Vier gleich breite Spalten: Die Logospalte hatte als `auto` nur die
+     Breite der Marke und wirkte dadurch eingeklemmt. */
+  @media (min-width: 60rem) {
+    .site-footer__grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--s-8);
+      align-items: start;
+    }
+  }
+
+  .site-footer__mark { color: var(--text-on-dark-3, #A09D93); }
+  .site-footer__mark :global(svg) {
+    width: 6.5rem;
+    height: auto;
+  }
+
+  .site-footer__label {
+    color: var(--text-on-dark-2);
+    margin-bottom: var(--s-3);
+  }
+
+  /* Ohne Unterstreichung – im Footer trägt die Zuordnung über die Spalte,
+     nicht über die Linie. Der Hover bleibt als Bestätigung erhalten. */
+  .site-footer__link {
+    color: var(--text-on-dark-2);
+    text-decoration: none;
+    transition: color var(--dur) var(--ease);
+  }
+  .site-footer__link:hover {
+    color: var(--text-on-dark);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .site-footer__list { display: grid; gap: var(--s-2); }
+
+  /* Gleicher Ton wie die Links – „Mitglied der" stand sonst heller
+     als alles andere in der Spalte. */
+  .site-footer__text { color: var(--text-on-dark-2); }
+
+  .site-footer__rule {
+    border-top-color: var(--border-dark);
+    margin-block: var(--s-12) var(--s-6);
+  }
+
+  .site-footer__meta {
+    display: grid;
+    gap: var(--s-2);
+    color: var(--text-on-dark-2);
+  }
+
+  @media (min-width: 52rem) {
+    .site-footer__meta {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: var(--s-8);
+    }
+    .site-footer__ai { text-align: right; }
+  }
+</style>

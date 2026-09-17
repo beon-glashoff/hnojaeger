@@ -1,0 +1,13 @@
+---
+interface Props {
+  label: string;
+  titel: string;
+  id?: string;
+}
+const { label, titel, id } = Astro.props;
+---
+
+<div class="section__head reveal">
+  <p class="label">{label}</p>
+  <h2 class="h2" id={id}>{titel}</h2>
+</div>

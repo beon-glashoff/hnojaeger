@@ -1,0 +1,251 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/theme-dunkel.css';
+import '../styles/theme-sand.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { site, kontakt, kammer, taetigkeitsorte } from '../data/site';
+import { schwerpunkte } from '../data/content';
+
+interface Props {
+  title: string;
+  description: string;
+  noindex?: boolean;
+  /** Nur auf der Startseite: Personen-Graph ausgeben */
+  profilePage?: boolean;
+  /** Designvariante. 'hell' ist die Standardgestaltung. */
+  variant?: 'hell' | 'dunkel' | 'sand';
+  /** Header über einen Vollbild-Hero legen: transparent, beim Scrollen hinterlegt. */
+  headerOverlay?: boolean;
+  /** Umschalter zwischen dunkler und heller Ansicht im Menü anbieten. */
+  modeToggle?: boolean;
+  /** Zusätzliche strukturierte Daten dieser Seite (z. B. MedicalWebPage, FAQPage). */
+  schema?: Record<string, unknown>[];
+}
+
+const {
+  title,
+  description,
+  noindex = false,
+  profilePage = false,
+  variant = 'hell',
+  headerOverlay = false,
+  modeToggle = false,
+  schema = [],
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const ogImage = new URL('/og-bild.jpg', site.url).href;
+
+/**
+ * Strukturierte Daten — Schwerpunkt: die Person als eindeutige Entität.
+ *
+ * Bewusst OHNE `address` und ohne `Physician`/`MedicalBusiness`:
+ * Die Anschrift Königstraße 31 ist die Privatanschrift und steht aus
+ * rechtlichen Gründen im Impressum. Als Standortsignal ausgegeben, würde
+ * sie eine Praxis an einer Adresse behaupten, an der es keine gibt.
+ * Das kommt in Phase 2 mit der echten Praxisadresse dazu.
+ */
+const personId = `${site.url}/#anne-jaeger`;
+
+const graph = [
+  {
+    '@type': 'ProfilePage',
+    '@id': `${site.url}/#profil`,
+    url: `${site.url}/`,
+    name: `${site.name} – ${site.role}`,
+    inLanguage: 'de-DE',
+    mainEntity: { '@id': personId },
+    isPartOf: { '@id': `${site.url}/#website` },
+  },
+  {
+    '@type': 'Person',
+    '@id': personId,
+    name: site.name,
+    honorificPrefix: 'Dr. med.',
+    givenName: 'Anne',
+    familyName: 'Jäger',
+    gender: 'Female',
+    jobTitle: site.role,
+    description:
+      'Dr. med. Anne Jäger ist Fachärztin für Hals-Nasen-Ohrenheilkunde mit den Zusatzbezeichnungen Allergologie, Psychosomatische Grundversorgung und Präventivmedizin. Ihre Schwerpunkte sind schlafmedizinische Diagnostik, Allergologie, Kinder-HNO und ästhetische Medizin.',
+    url: `${site.url}/`,
+    image: new URL('/portrait-anne-jaeger.jpg', site.url).href,
+    email: `mailto:${kontakt.email}`,
+    knowsLanguage: ['de', 'en'],
+    knowsAbout: [
+      'Hals-Nasen-Ohrenheilkunde',
+      'Schlafmedizinische Diagnostik',
+      'Schlafapnoe-Syndrom',
+      'Schnarchen',
+      'Allergologie',
+      'Kinder-HNO',
+      'Präventivmedizin',
+      'Ästhetische Medizin',
+      ...schwerpunkte.map((s) => s.titel),
+    ],
+    alumniOf: {
+      '@type': 'CollegeOrUniversity',
+      name: 'Johann Wolfgang Goethe-Universität Frankfurt am Main',
+    },
+    memberOf: { '@type': 'Organization', name: kammer.name, url: kammer.url },
+    hasCredential: [
+      {
+        '@type': 'EducationalOccupationalCredential',
+        credentialCategory: 'Facharztanerkennung',
+        name: 'Fachärztin für Hals-Nasen-Ohrenheilkunde, Kopf-Hals-Chirurgie',
+      },
+      {
+        '@type': 'EducationalOccupationalCredential',
+        credentialCategory: 'Zusatzbezeichnung',
+        name: 'Allergologie',
+      },
+      {
+        '@type': 'EducationalOccupationalCredential',
+        credentialCategory: 'Zusatzbezeichnung',
+        name: 'Psychosomatische Grundversorgung',
+      },
+      {
+        '@type': 'EducationalOccupationalCredential',
+        credentialCategory: 'Zusatzbezeichnung',
+        name: 'Präventivmedizin',
+      },
+      {
+        '@type': 'EducationalOccupationalCredential',
+        credentialCategory: 'Promotion',
+        name: 'Dr. med.',
+      },
+    ],
+    worksFor: taetigkeitsorte.map((o) => ({
+      '@type': 'MedicalClinic',
+      name: `${o.praxis} ${o.inhaber}`,
+      ...(o.url ? { url: o.url } : {}),
+    })),
+  },
+  {
+    '@type': 'WebSite',
+    '@id': `${site.url}/#website`,
+    url: `${site.url}/`,
+    name: `${site.nameShort} – ${site.roleShort}`,
+    inLanguage: 'de-DE',
+    publisher: { '@id': personId },
+  },
+];
+
+const jsonLd = { '@context': 'https://schema.org', '@graph': graph };
+---
+
+<!doctype html>
+<html lang="de" data-variant={variant}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+
+    <link
+      rel="preload"
+      href="/fonts/Inter-var-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content={variant === 'sand' ? '#ECE3D8' : variant === 'dunkel' ? '#2B3033' : '#373D42'} />
+
+    {modeToggle && (
+      <script is:inline>
+        // Läuft vor dem ersten Paint: sonst blitzt die Seite kurz im
+        // Standardmodus auf, bevor die gespeicherte Wahl greift.
+        try {
+          var m = localStorage.getItem('hnoj-mode');
+          if (m === 'light' || m === 'dark') document.documentElement.dataset.mode = m;
+        } catch (e) {}
+      </script>
+    )}
+
+    <meta property="og:type" content="profile" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:site_name" content={site.nameShort} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {profilePage && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {schema.length > 0 && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify({ '@context': 'https://schema.org', '@graph': schema })}
+      />
+    )}
+  </head>
+
+  <body>
+    <a href="#inhalt" class="skip-link">Zum Inhalt springen</a>
+    <SiteHeader overlay={headerOverlay} modeToggle={modeToggle} />
+    <main id="inhalt">
+      <slot />
+    </main>
+    <SiteFooter />
+
+    <script>
+      // Einziger Bewegungseffekt der Seite: Einblenden beim Scrollen.
+      // --- Umschalter dunkel / hell -------------------------------------
+      const root = document.documentElement;
+      const toggle = document.querySelector<HTMLButtonElement>('[data-mode-toggle]');
+
+      if (toggle) {
+        const label = toggle.querySelector('[data-mode-label]');
+        const themeColor = document.querySelector('meta[name="theme-color"]');
+
+        const sync = () => {
+          const light = root.dataset.mode === 'light';
+          const text = light ? 'Zur dunklen Ansicht wechseln' : 'Zur hellen Ansicht wechseln';
+          toggle.setAttribute('aria-label', text);
+          if (label) label.textContent = text;
+          if (themeColor) themeColor.setAttribute('content', light ? '#FFFFFF' : '#2B3033');
+        };
+
+        sync();
+
+        toggle.addEventListener('click', () => {
+          root.dataset.mode = root.dataset.mode === 'light' ? 'dark' : 'light';
+          try {
+            localStorage.setItem('hnoj-mode', root.dataset.mode);
+          } catch (e) {
+            // Privater Modus oder blockierte Speicherung – die Wahl gilt dann
+            // nur für diesen Seitenaufruf. Kein Grund abzubrechen.
+          }
+          sync();
+        });
+      }
+
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const targets = document.querySelectorAll<HTMLElement>('.reveal');
+
+      if (reduce || !('IntersectionObserver' in window)) {
+        targets.forEach((el) => el.classList.add('is-visible'));
+      } else {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                io.unobserve(entry.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -10% 0px', threshold: 0.1 }
+        );
+        targets.forEach((el) => io.observe(el));
+      }
+    </script>
+  </body>
+</html>

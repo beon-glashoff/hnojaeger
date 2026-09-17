@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site, kontakt } from '../data/site';
+
+/**
+ * Ausführlicher medizinischer Haftungsausschluss. Aus jeder Ratgeberseite
+ * und aus dem Footer verlinkt. Rechtlicher Hintergrund in
+ * 05_Recht-und-Datenschutz.md, Abschnitt 4 (Fernbehandlungsverbot).
+ *
+ * ENTWURF – vor dem Go-live anwaltlich prüfen lassen.
+ */
+---
+
+<BaseLayout
+  variant="dunkel"
+  modeToggle
+  noindex
+  title={`Hinweise zu den Gesundheitsinformationen – ${site.nameShort}`}
+  description="Hinweise zur Nutzung der Gesundheitsinformationen auf dieser Seite."
+>
+  <section class="section">
+    <div class="container">
+      <nav class="krumen small" aria-label="Brotkrumen"><a href="/">Start</a></nav>
+
+      <h1 class="display titel">Hinweise zu den Gesundheitsinformationen</h1>
+
+      <div class="text prose">
+        <h2 class="h3">Allgemeine Information, keine Beratung</h2>
+        <p>
+          Die Texte auf dieser Website dienen der allgemeinen Information über
+          Krankheitsbilder und Untersuchungsverfahren der Hals-Nasen-Ohrenheilkunde.
+          Sie richten sich an die Allgemeinheit und beziehen sich nicht auf
+          einzelne Personen oder konkrete Beschwerden.
+        </p>
+        <p>
+          Sie ersetzen weder eine ärztliche Untersuchung noch eine Diagnose oder
+          Behandlung. Aus den hier veröffentlichten Inhalten lässt sich kein
+          Behandlungsverhältnis ableiten.
+        </p>
+
+        <h2 class="h3">Keine Beratung über diese Website</h2>
+        <p>
+          Über diese Website, per E-Mail oder auf anderem elektronischen Weg ist
+          keine individuelle medizinische Beratung möglich. Beschwerden können
+          vielfältige Ursachen haben, die sich nur im persönlichen Gespräch und
+          durch eine körperliche Untersuchung klären lassen. Bitte vereinbaren Sie
+          dafür einen Termin in einer der Praxen, in denen
+          {' '}{site.name} tätig ist.
+        </p>
+
+        <h2 class="h3">Im Notfall</h2>
+        <p>
+          Bei akuten oder bedrohlichen Beschwerden wenden Sie sich bitte
+          unverzüglich an den ärztlichen Bereitschaftsdienst unter
+          {' '}<a href="tel:116117" class="link">116 117</a> oder im Notfall an den
+          Rettungsdienst unter <a href="tel:112" class="link">112</a>. Warten Sie
+          in diesen Fällen nicht auf eine Antwort per E-Mail.
+        </p>
+
+        <h2 class="h3">Aktualität</h2>
+        <p>
+          Die Inhalte werden nach bestem Wissen erstellt und regelmäßig
+          überprüft. Das Datum der letzten fachlichen Prüfung steht am Ende jedes
+          Fachtextes. Medizinisches Wissen entwickelt sich weiter; eine Gewähr
+          für Vollständigkeit und fortdauernde Richtigkeit kann nicht übernommen
+          werden.
+        </p>
+
+        <h2 class="h3">Externe Verweise</h2>
+        <p>
+          Diese Website verweist an einzelnen Stellen auf Websites Dritter, etwa
+          auf die Praxen, in denen {site.nameShort} tätig ist. Für deren Inhalte
+          sind ausschließlich die jeweiligen Anbieter verantwortlich.
+        </p>
+
+        <h2 class="h3">Fragen zu diesen Hinweisen</h2>
+        <p>
+          Bei Fragen zu diesen Hinweisen erreichen Sie uns unter
+          {' '}<a href={`mailto:${kontakt.email}`} class="link">{kontakt.email}</a>.
+          Bitte senden Sie über diese Adresse keine Angaben zu Ihrer Gesundheit —
+          E-Mail ist dafür kein geeigneter Weg.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .krumen { color: var(--text-muted); }
+  .krumen a { text-decoration: none; }
+  .krumen a:hover { color: var(--text-primary); }
+
+  .titel { margin-top: var(--s-6); max-width: 20ch; }
+  .text { margin-top: var(--s-16); }
+  .text :global(h2) { margin-top: var(--s-12); margin-bottom: var(--s-4); }
+  .text :global(h2:first-child) { margin-top: 0; }
+  .text :global(p) { color: var(--text-secondary); }
+</style>

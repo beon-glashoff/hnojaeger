@@ -1,0 +1,60 @@
+---
+import { Image } from 'astro:assets';
+import portrait from '../assets/images/portrait-hoch.png';
+import { site } from '../data/site';
+
+interface Props {
+  /** Datum der letzten fachlichen Prüfung, ISO-Format. */
+  geprueft: string;
+}
+const { geprueft } = Astro.props;
+
+const datum = new Intl.DateTimeFormat('de-DE', {
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric',
+}).format(new Date(geprueft));
+---
+
+{/* E-E-A-T-Signal für Suchmaschinen und Qualitätsversprechen für den Leser:
+    Wer hat den Text geprüft, mit welcher Qualifikation, wann zuletzt. */}
+<div class="autor">
+  <Image
+    src={portrait}
+    alt=""
+    widths={[96, 144]}
+    sizes="72px"
+    format="webp"
+    quality={78}
+    loading="lazy"
+    class="autor__bild"
+  />
+  <p class="small autor__text">
+    <span class="autor__name">Fachlich geprüft von {site.name}</span>
+    <span class="autor__rolle">{site.roleLong}</span>
+    <span class="autor__datum">Zuletzt geprüft am <time datetime={geprueft}>{datum}</time></span>
+  </p>
+</div>
+
+<style>
+  .autor {
+    display: flex;
+    align-items: center;
+    gap: var(--s-4);
+    max-width: var(--measure);
+    margin-top: var(--s-8);
+  }
+  .autor__bild {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: var(--radius-pill);
+    object-fit: cover;
+    object-position: 50% 18%;
+    flex: none;
+  }
+  .autor__text { display: grid; gap: 0.15em; }
+  /* Papier-Token: Die Zeile steht auf der hellen Textfläche. */
+  .autor__name { color: var(--text-on-paper); }
+  .autor__rolle,
+  .autor__datum { color: var(--text-on-paper-2); }
+</style>

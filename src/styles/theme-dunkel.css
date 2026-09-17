@@ -1,0 +1,87 @@
+/* ==========================================================================
+   Variante B · „Nocturne"
+   Alle Flächen sind abgedunkeltes Anthrazit. Keine neue Markenfarbe.
+   Gemessene Kontraste stehen in Klammern.
+
+   Aufbau: Das Layout (volle Fensterbreite) gilt in beiden Farbmodi.
+   Die Farbtoken gelten nur im dunklen Modus — im hellen fällt die Seite
+   auf die Basistoken zurück, also auf die Palette der Variante A.
+   ========================================================================== */
+
+/* --- Layout: gilt unabhängig vom Modus ---------------------------------- */
+/*
+ * Variante B läuft durchgehend über die volle Fensterbreite. Die Regel steht
+ * hier und nicht in der Seite, weil Astro-Styles komponentenweise gekapselt
+ * sind — ein Override in dunkel.astro würde Header und Footer nicht erreichen,
+ * und die Sektionen ständen dann auf einer anderen Kante als die beiden.
+ */
+:root[data-variant='dunkel'] .container {
+  max-width: none;
+}
+
+/* --- Farben: dunkler Modus (Standard) ----------------------------------- */
+:root[data-variant='dunkel']:not([data-mode='light']) {
+  color-scheme: dark;
+
+  /* Text */
+  --text-primary:   #E7E7E3;  /* Light Sage · 10,77:1 auf Grundfläche */
+  --text-secondary: #B5B3AB;  /*               6,36:1 */
+  --text-muted:     #A09D93;  /* Sage trägt hier Kleintext · 4,92:1 –
+                                 auf hellem Grund könnte es das nicht */
+  --text-on-dark:   #E7E7E3;
+  --text-on-dark-2: #B5B3AB;
+  --text-on-dark-3: #A09D93;
+
+  /* Flächen */
+  --surface:        #2B3033;  /* Grundfläche: Anthrazit + 22 % Schwarz */
+  --surface-subtle: #25292D;  /* tieferes Band                          */
+  --surface-sage:   #373D42;  /* „erhöhte" Fläche = CD-Anthrazit pur    */
+  --surface-dark:   #23272A;  /* Footer                                 */
+
+  /* Die einzige helle Zäsur der Startseite — dort bewusst nur einmal benutzt */
+  --surface-bright:   #E7E7E3;
+  --text-on-bright:   #373D42;  /* 8,87:1 */
+  --text-on-bright-2: #616362;  /* 4,88:1 */
+  --border-on-bright: #C4C2BB;
+
+  /* Textfläche der Fachseiten: langer Fließtext gehört auch im dunklen
+     Modus auf hellen Grund — über mehrere Bildschirme liest sich helle
+     Schrift auf dunklem Grund spürbar anstrengender. */
+  --surface-paper:       #E7E7E3;
+  --text-on-paper:       #373D42;  /* 8,87:1 */
+  --text-on-paper-2:     #616362;  /* 4,88:1 */
+  --text-on-paper-muted: #616362;  /* 4,88:1 – auf Light Sage trägt kein hellerer Ton */
+  --border-on-paper:     #C4C2BB;
+
+  /* Linien */
+  --border:        #454A4D;
+  --border-strong: #5C6164;
+  --border-dark:   #3A3F42;
+
+  /* Funktional */
+  --icon:  #B5B3AB;
+  --focus: #E7E7E3;
+}
+
+/* --- Farben: heller Modus ------------------------------------------------
+ * Hier greifen die Basistoken (Variante A). Nur die Werte für das
+ * „helle Band" der Sprechstunden brauchen eine eigene Fassung: Auf weißem
+ * Grund kann ein helles Band keine Zäsur mehr setzen, dort übernimmt
+ * Light Sage diese Rolle.
+ * ----------------------------------------------------------------------- */
+:root[data-variant='dunkel'][data-mode='light'] {
+  color-scheme: light;
+
+  --surface-bright:   #E7E7E3;  /* Light Sage statt Weiß */
+  --text-on-bright:   #373D42;  /* 8,87:1 */
+  --text-on-bright-2: #616362;  /* 4,88:1 */
+  --border-on-bright: #C4C2BB;
+
+  /* Im hellen Modus ist die Grundfläche ohnehin weiß – die Textfläche
+     braucht dort keine eigene Tönung. */
+  --surface-paper:       #FFFFFF;
+  --text-on-paper:       #373D42;  /* 11,00:1 */
+  --text-on-paper-2:     #616362;  /*  6,05:1 */
+  --text-on-paper-muted: #767773;  /*  4,51:1 */
+  --border-on-paper:     #D2D1CB;
+}

@@ -1,0 +1,28 @@
+{
+  "name": "hnojaeger",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "wrangler deploy",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^7.3.3",
+    "sharp": "^0.34.1"
+  },
+  "devDependencies": {
+    "@tabler/icons": "^3.31.0",
+    "wrangler": "^4.133.0"
+  },
+  "allowScripts": {
+    "sharp@0.34.5": true,
+    "esbuild@0.28.2": true,
+    "workerd@1.20260916.1": true,
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true
+  }
+}

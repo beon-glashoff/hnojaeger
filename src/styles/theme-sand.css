@@ -1,0 +1,38 @@
+/* ==========================================================================
+   Variante C · „Sand" — warm
+   ACHTUNG: Diese Variante führt eine Farbfamilie ein, die das CD-Manual
+   nicht kennt. Der Ton ist aus dem Parkett der Bildwelt (Praxis_1, gemessen
+   #CEB79E) abgeleitet und mit Weiß aufgehellt. Wenn diese Variante gewählt
+   wird, gehört Sand als vierter Ton ins CD-Manual aufgenommen.
+   ========================================================================== */
+
+:root[data-variant='sand'] {
+  color-scheme: light;
+
+  --c-sand:       #CEB79E;   /* Referenzton aus der Bildwelt */
+
+  /* --- Text ------------------------------------------------------------ */
+  --text-primary:   #373D42;  /* Anthrazit · 8,67:1 auf Sand           */
+  --text-secondary: #5C5953;  /* warmes Grau · 5,50:1 · Band 4,62:1    */
+  --text-muted:     #655F57;  /* 4,97:1 auf Sand · auf dem Band trägt
+                                 er nicht (4,18) – dort --text-secondary */
+
+  /* --- Flächen --------------------------------------------------------- */
+  --surface:        #ECE3D8;  /* Sand, Grundfläche                       */
+  --surface-subtle: #FFFFFF;  /* Karten heben sich nach oben ab (1,27:1) */
+  --surface-sage:   #DFD0BD;  /* tieferes Sandband                       */
+  --surface-dark:   #373D42;  /* Footer bleibt Anthrazit – erdet die warme Seite */
+
+  /* --- Linien ---------------------------------------------------------- */
+  --border:        #DFD0BD;
+  --border-strong: #D6C4AC;
+  --border-dark:   #4E5359;
+
+  /* --- Funktional ------------------------------------------------------ */
+  --icon:  #655F57;
+  --focus: #373D42;
+
+  /* --- Form: der sichtbarste Unterschied zur Variante A ----------------- */
+  --radius-card:  20px;
+  --radius-media: 28px;
+}

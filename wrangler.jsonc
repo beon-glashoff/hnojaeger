@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hnojaeger",
+  "compatibility_date": "2026-09-17",
+
+  // Wrangler baut vor jedem Deploy selbst. Dadurch genuegt in der Cloudflare-CI
+  // der Deploy-Befehl "npx wrangler deploy" - ohne diesen Hook faende er kein ./dist.
+  "build": {
+    "command": "npm run build",
+    "watch_dir": "src"
+  },
+
+  // Reines Static-Asset-Deployment: kein Worker-Script noetig.
+  // "auto-trailing-slash" passt zu trailingSlash: 'always' und
+  // build.format: 'directory' in astro.config.mjs.
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

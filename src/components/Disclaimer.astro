@@ -1,0 +1,35 @@
+---
+/**
+ * Medizinischer Haftungsausschluss. Steht auf jeder Ratgeberseite sichtbar
+ * am Ende des Fachtextes – nicht im Footer. Rechtlicher Hintergrund:
+ * Fernbehandlungsverbot, siehe 05_Recht-und-Datenschutz.md, Abschnitt 4.
+ */
+---
+
+<aside class="disclaimer">
+  <p class="disclaimer__text small">
+    Dieser Text dient Ihrer allgemeinen Information und ersetzt keine ärztliche
+    Untersuchung, Diagnose oder Behandlung. Beschwerden können vielfältige
+    Ursachen haben, die sich nur im persönlichen Gespräch und durch eine
+    körperliche Untersuchung klären lassen. Bitte suchen Sie bei anhaltenden
+    oder zunehmenden Beschwerden ärztlichen Rat. Weitere Hinweise unter
+    <a href="/gesundheitsinformationen/" class="link">Gesundheitsinformationen</a>.
+  </p>
+</aside>
+
+<style>
+  /* Steht auf der hellen Textfläche der Fachseiten – deshalb die
+     Papier-Token und nicht die Seitentöne, die im dunklen Modus hell sind. */
+  .disclaimer {
+    max-width: var(--measure);
+    margin-top: var(--s-16);
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--border-on-paper);
+  }
+  .disclaimer__text { color: var(--text-on-paper-2); line-height: 1.6; }
+  .disclaimer__text :global(.link) {
+    color: var(--text-on-paper);
+    text-decoration-color: var(--border-on-paper);
+  }
+  .disclaimer__text :global(.link:hover) { text-decoration-color: var(--text-on-paper); }
+</style>

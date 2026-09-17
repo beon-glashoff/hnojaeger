@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<BaseLayout
+  title="Seite nicht gefunden – Dr. med. Anne Jäger"
+  description="Die aufgerufene Seite existiert nicht."
+  noindex
+>
+  <section class="section">
+    <div class="container">
+      <p class="label">Fehler 404</p>
+      <h1 class="display error__title">Diese Seite gibt es nicht.</h1>
+      <p class="lead error__text">
+        Möglicherweise hat sich die Adresse geändert oder ein Link ist veraltet.
+      </p>
+      <p class="error__back">
+        <a href="/" class="arrow-link">
+          <span>Zur Startseite</span>
+          <Icon name="arrow-narrow-right" />
+        </a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .error__title { margin-top: var(--s-4); }
+  .error__text { margin-top: var(--s-6); color: var(--text-secondary); }
+  .error__back { margin-top: var(--s-12); }
+</style>

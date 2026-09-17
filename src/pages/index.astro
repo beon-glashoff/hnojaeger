@@ -1,0 +1,684 @@
+---
+import { getImage, Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import portrait2 from '../assets/images/portrait-2.png';
+import portraitMobil from '../assets/images/portrait-hoch-mobil.png';
+import { site, taetigkeitsorte } from '../data/site';
+import { schwerpunkte, leistungsspektrum, vita, qualifikationen } from '../data/content';
+
+/**
+ * Hauptvariante (vormals „Variante B · Nocturne")
+ *
+ * Unterschied zu A ist nicht nur die Farbe, sondern die Gliederung:
+ * kein Kachelraster, sondern durchlaufende Bänder über die volle Breite.
+ * Die Schwerpunkte werden zur nummerierten Liste, die Vita zur zweispaltigen
+ * Zeitachse mit großen Jahreszahlen. Ein einziges helles Band setzt die Zäsur.
+ */
+
+/*
+ * Art Direction für den Vollbild-Hero: Das Querformat (Portrait 2) trägt den
+ * Desktop — sie steht links, der Text sitzt rechts im Raum. In einen hohen
+ * Telefonausschnitt gerechnet würde derselbe Anschnitt sie zerschneiden,
+ * deshalb liefert Mobil das Hochformat. `<picture>` ist hier handgebaut,
+ * weil Astros <Picture> nur eine Quelle kennt — so lädt auch nur eine Datei.
+ */
+const wide = await Promise.all(
+  [1200, 1600, 2000, 2560].map((w) =>
+    getImage({ src: portrait2, width: w, format: 'avif', quality: 74 })
+  )
+);
+const wideWebp = await Promise.all(
+  [1200, 1600, 2000].map((w) =>
+    getImage({ src: portrait2, width: w, format: 'webp', quality: 76 })
+  )
+);
+/* Für den Telefonausschnitt gibt es eine eigene Aufnahme: 898 × 1751,
+   fast genau das Seitenverhältnis eines Telefons. Sie steht im oberen
+   Drittel, darunter bleibt Raum für den Text — nichts überlagert sie. */
+const tall = await Promise.all(
+  [640, 900, 1200].map((w) =>
+    getImage({ src: portraitMobil, width: w, format: 'avif', quality: 74 })
+  )
+);
+const tallWebp = await Promise.all(
+  [640, 900, 1200].map((w) =>
+    getImage({ src: portraitMobil, width: w, format: 'webp', quality: 76 })
+  )
+);
+const fallback = await getImage({ src: portrait2, width: 1600, format: 'jpeg', quality: 76 });
+
+const srcset = (imgs: { src: string; attributes?: Record<string, unknown> }[], widths: number[]) =>
+  imgs.map((img, i) => `${img.src} ${widths[i]}w`).join(', ');
+
+const MOBILE = '(max-width: 47.999rem)';
+const DESKTOP = '(min-width: 48rem)';
+---
+
+<BaseLayout
+  variant="dunkel"
+  headerOverlay
+  modeToggle
+  profilePage
+  title="Dr. med. Anne Jäger – Fachärztin für HNO-Heilkunde"
+  description="Dr. med. Anne Jäger ist Fachärztin für Hals-Nasen-Ohrenheilkunde mit den Schwerpunkten Schlafmedizin, Allergologie, Kinder-HNO und ästhetischer Medizin. Derzeit tätig in Köln-Rodenkirchen und Hennef."
+>
+  {/* ======================================== Hero: Vollbild mit Verlauf */}
+  <section class="hero">
+    <picture class="hero__pic">
+      <source media={MOBILE} type="image/avif" srcset={srcset(tall, [640, 900, 1200])} sizes="100vw" />
+      <source media={MOBILE} type="image/webp" srcset={srcset(tallWebp, [640, 900, 1200])} sizes="100vw" />
+      <source media={DESKTOP} type="image/avif" srcset={srcset(wide, [1200, 1600, 2000, 2560])} sizes="100vw" />
+      <source media={DESKTOP} type="image/webp" srcset={srcset(wideWebp, [1200, 1600, 2000])} sizes="100vw" />
+      <img
+        src={fallback.src}
+        alt={`${site.name}, ${site.role}`}
+        width={1536}
+        height={1024}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        class="hero__img"
+      />
+    </picture>
+
+    <div class="hero__veil" aria-hidden="true"></div>
+
+    <div class="container hero__inner">
+      <div class="hero__text">
+        <h1 class="hero__h1">
+          <span class="hero__name">{site.nameShort}</span>
+          <span class="hero__role label">{site.role}</span>
+        </h1>
+        <p class="lead hero__lead">
+          Allergologie, Schlafmedizin, Kinder-HNO und ästhetische Medizin.
+          Derzeit tätig in Köln-Rodenkirchen und Hennef.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ===================================================== Statement */}
+  <section class="section section--subtle">
+    <div class="container">
+      <p class="label reveal">Ärztliches Selbstverständnis</p>
+      <blockquote class="statement reveal">
+        Ich habe in Frankfurt, Wien und Durban gelernt, dass gute Medizin mit
+        Zuhören beginnt. Vieles, was in der Hals-Nasen-Ohrenheilkunde als
+        Alltagsbeschwerde abgetan wird, hat eine Ursache, die sich finden lässt.
+      </blockquote>
+      <p class="statement__cite small reveal">Dr. med. Anne Jäger</p>
+    </div>
+  </section>
+
+  {/* ===================================== Schwerpunkte: breite Bänder */}
+  {/* Über die volle Fensterbreite: Auf dunklem Grund brauchen die Bilder
+      Fläche, um zu tragen. Der Fließtext bleibt trotzdem auf Lesemaß
+      begrenzt — ein 700 px breiter Absatz wäre nicht mehr lesbar. */}
+  <section class="section" id="schwerpunkte">
+    <div class="container">
+      {/* Diese Sektion war als einzige ohne Überschrift – im Dokumentumriss
+          eine Lücke zwischen H1 und den folgenden H2. */}
+      <p class="label reveal">Schwerpunkte</p>
+      <h2 class="h2 sec__title reveal">Vier Bereiche, in denen ich in die Tiefe gehe</h2>
+
+      <ul class="rows reveal">
+        {schwerpunkte.map((s) => (
+          <li class="row">
+            <a href={`/leistungen/${s.slug}/`} class="row__link">
+              <span class="row__media">
+                <Picture
+                  src={s.bild}
+                  alt={s.bildAlt}
+                  widths={[360, 540, 760]}
+                  sizes="(min-width: 64rem) 24vw, (min-width: 40rem) 46vw, 100vw"
+                  formats={['avif', 'webp']}
+                  fallbackFormat="jpeg"
+                  quality={72}
+                  loading="lazy"
+                  class="row__img"
+                />
+                <span class="row__arrow"><Icon name="arrow-narrow-right" /></span>
+              </span>
+
+              <span class="row__body">
+                <span class="label row__kicker">{s.kurz}</span>
+                <span class="row__title">{s.titel}</span>
+                <span class="row__text">{s.kurztext}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* ================================================ Leistungsspektrum */}
+  <section class="section section--subtle" id="leistungen">
+    <div class="container">
+      <p class="label reveal">Leistungen</p>
+      <h2 class="h2 sec__title reveal">Das konservative HNO-Spektrum</h2>
+
+      <dl class="spektrum reveal">
+        {leistungsspektrum.map((g) => (
+          <div class="spektrum__row">
+            <dt class="label spektrum__group">
+              <Icon name={g.icon} class="spektrum__icon" />
+              <span>{g.titel}</span>
+            </dt>
+            <dd class="spektrum__items">{g.punkte.join('\u00A0· ')}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  {/* ============================================ Vita: große Jahreszahlen */}
+  <section class="section" id="vita">
+    <div class="container">
+      <p class="label reveal">Werdegang</p>
+      <h2 class="h2 sec__title reveal">Vita</h2>
+
+      {vita.map((gruppe) => (
+        <div class="vita reveal">
+          <h3 class="label vita__group">{gruppe.titel}</h3>
+          <ol class="vita__list">
+            {gruppe.stationen.map((st) => (
+              <li class="vita__item">
+                <span class="vita__jahr">{st.jahr}</span>
+                <span class="vita__body">
+                  <span class="vita__text">{st.text}</span>
+                  {st.ort && <span class="small vita__ort">{st.ort}</span>}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ))}
+
+      <p class="quali reveal">
+        {qualifikationen.map((q, i) => (
+          <>
+            {i > 0 && <span class="quali__sep" aria-hidden="true"> · </span>}
+            <span class="quali__item">{q}</span>
+          </>
+        ))}
+      </p>
+    </div>
+  </section>
+
+  {/* ====================== Sprechstunden: die einzige helle Zäsur */}
+  <section class="section bright" id="sprechstunden">
+    <div class="container">
+      <p class="label bright__label">Sprechstunden</p>
+      <h2 class="h2 sec__title bright__title">Wo Sie mich heute erreichen</h2>
+
+      <ul class="orte">
+        {taetigkeitsorte.map((o) => {
+          const Wrapper = o.url ? 'a' : 'div';
+          return (
+            <li class="ort">
+              <Wrapper
+                class="ort__inner"
+                {...(o.url
+                  ? {
+                      href: o.url,
+                      rel: 'noopener',
+                      target: '_blank',
+                      'aria-label': `${o.praxis}, ${o.ort} — Praxis-Website öffnen`,
+                    }
+                  : {})}
+              >
+                <span class="label ort__seit">{o.seit}</span>
+                <span class="ort__main">
+                  <span class="ort__name">{o.praxis}</span>
+                  <span class="small ort__inhaber">{o.inhaber} · {o.ort}</span>
+                </span>
+                <span class="small ort__schwerpunkt">{o.schwerpunkt}</span>
+                {o.url && <span class="ort__arrow"><Icon name="arrow-narrow-right" /></span>}
+              </Wrapper>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* Rechtlich relevant (Fernbehandlungsverbot) – steht deshalb dort,
+          wo jemand über eine Kontaktaufnahme nachdenkt, und nicht im Footer.
+          Bewusst als ruhiger Nachsatz gesetzt. */}
+      <p class="note">
+        Über diese Seite ist keine medizinische Beratung möglich — bitte
+        vereinbaren Sie dafür einen Termin in einer der Praxen, in denen ich
+        tätig bin. In dringenden Fällen wenden Sie sich an den ärztlichen
+        Bereitschaftsdienst unter 116 117, im Notfall an 112.
+      </p>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .sec__title { margin-top: var(--s-4); margin-bottom: var(--s-16); }
+
+  /* --------------------------------------------- Hero: Vollbild */
+  .hero {
+    position: relative;
+    display: grid;
+    align-items: end;
+    min-height: 100svh;
+    overflow: hidden;
+    isolation: isolate;
+    /* Feste Tinte: Der Hero liegt in beiden Farbmodi auf einem dunklen
+       Verlauf über dem Foto – hier darf nichts umschlagen. */
+    color: #E7E7E3;
+  }
+
+  .hero__pic {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    display: block;
+  }
+
+  /*
+   * Auf dem Telefon füllt die hohe Aufnahme den Ausschnitt exakt aus –
+   * es gibt keinen vertikalen Spielraum, `object-position` bleibt dort
+   * wirkungslos (gemessen: 0 px Überhang). Um den Ausschnitt trotzdem
+   * anzuheben, wird die Bildfläche 20 % höher als der Hero gemacht und
+   * oben herausgezogen. Prozentwerte in `inset` beziehen sich auf die
+   * Höhe des umgebenden Blocks – bei `margin` wäre es die Breite.
+   */
+  @media (max-width: 47.999rem) {
+    .hero__pic { inset: -20% 0 0 0; }
+  }
+  .hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Mobil liegt die hohe Aufnahme an – sie steht dort im oberen Drittel */
+    object-position: 50% 8%;
+    /* Sehr langsam und nur 4 % – die Bewegung soll man eher spüren
+       als sehen. Läuft einmal und bleibt dann stehen. */
+    animation: hero-zoom 26s var(--ease) forwards;
+  }
+
+  @keyframes hero-zoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.04); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__img { animation: none; }
+  }
+
+  /*
+   * Der Verlauf trägt die Lesbarkeit, nicht ein Textschatten.
+   * Mobil von unten, ab 60rem von rechts — dort steht sie links im Bild.
+   * Gemessen gegen die hellste denkbare Bildstelle (Weiß) ergibt die
+   * Enddeckkraft 0,88 einen Grund von ~#3B3E42: Light Sage erreicht
+   * darauf 8,5:1, der Sekundärton 5,0:1.
+   */
+  /* Mobil steht der Header mittig – dort braucht es weiterhin einen
+     durchgehenden Scrim, sonst läge die Navigation ungeschützt auf dem Bild. */
+  .hero__veil {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(
+        to top,
+        rgba(34, 38, 42, 0.92) 0%,
+        rgba(34, 38, 42, 0.82) 34%,
+        rgba(34, 38, 42, 0.28) 62%,
+        rgba(34, 38, 42, 0) 88%
+      ),
+      /* Scrim für die transparente Navigation */
+      linear-gradient(
+        to bottom,
+        rgba(34, 38, 42, 0.85) 0,
+        rgba(34, 38, 42, 0.78) 5.5rem,
+        rgba(34, 38, 42, 0) 14rem
+      );
+  }
+
+  @media (min-width: 60rem) {
+    .hero { align-items: center; }
+    .hero__img { object-position: 30% 26%; }   /* Querformat: sie steht links */
+    /*
+     * Kein durchgehender Scrim mehr: Der Verlauf kommt aus der rechten
+     * oberen Ecke (trägt Navigation und Textspalte) und mit einem kleinen
+     * Kegel aus der linken oberen Ecke (trägt die Wortmarke). Dazwischen –
+     * über ihrem Kopf – bleibt das Motiv unangetastet.
+     */
+    .hero__veil {
+      background:
+        linear-gradient(
+          to left,
+          rgba(34, 38, 42, 0.92) 0%,
+          rgba(34, 38, 42, 0.86) 32%,
+          rgba(34, 38, 42, 0.32) 56%,
+          rgba(34, 38, 42, 0) 78%
+        ),
+        radial-gradient(
+          58% 40% at 100% 0%,
+          rgba(34, 38, 42, 0.82) 0%,
+          rgba(34, 38, 42, 0.42) 46%,
+          rgba(34, 38, 42, 0) 76%
+        ),
+        /* Hinter der Wortmarke liegt ein Fenster – gemessen der hellste
+           Punkt der ganzen Fläche. Der Kegel muss ihn tragen: bei 0,88 im
+           Zentrum bleibt dort ein Grund von ~#4E5153, die Marke erreicht
+           5,9:1. Mit dem ersten Entwurf waren es nur 3,3:1. */
+        radial-gradient(
+          32% 34% at 0% 0%,
+          rgba(34, 38, 42, 0.88) 0%,
+          rgba(34, 38, 42, 0.74) 34%,
+          rgba(34, 38, 42, 0.36) 56%,
+          rgba(34, 38, 42, 0) 80%
+        );
+    }
+  }
+
+  .hero__inner {
+    position: relative;
+    display: grid;
+    padding-block: clamp(var(--s-16), 10vh, var(--s-24));
+  }
+  @media (min-width: 60rem) {
+    .hero__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 32rem); }
+    .hero__text { grid-column: 2; }
+  }
+
+  .hero__h1 { display: grid; gap: var(--s-4); }
+  .hero__name {
+    display: block;
+    font-size: clamp(2.5rem, 1.2rem + 5.6vw, 5.25rem);
+    font-weight: var(--fw-light);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+  /*
+   * Über dem Bild trägt der normale Sekundärton nicht. Gemessen: der hellste
+   * Bildpunkt hinter der Textspalte ist ein Fenster mit #FCFEFF; nach dem
+   * Verlauf bleibt ein Grund von ~#414448. Dort erreicht #B5B3AB nur 4,66:1
+   * und wäre ohne den vertieften Verlauf durchgefallen. --hero-dim liegt
+   * zwischen Sekundärton und Textton und hält 6,34:1.
+   */
+  .hero__text { --hero-dim: #D2D0C9; }
+  .hero__role { display: block; color: var(--hero-dim); }
+  .hero__lead { margin-top: var(--s-8); max-width: 34rem; color: var(--hero-dim); }
+
+  /* -------------------------------------------------------- Statement */
+  .statement {
+    margin: var(--s-8) 0 var(--s-4);
+    max-width: 44rem;
+    font-size: clamp(1.375rem, 1.05rem + 1.4vw, 2rem);
+    font-weight: var(--fw-light);
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+  }
+  /* --text-muted trägt im hellen Modus auf der gedämpften Fläche nicht
+     (4,32:1 bei 15 px). Der Sekundärton hält in beiden Modi. */
+  .statement__cite { color: var(--text-secondary); }
+
+  /* ------------------------------------ Schwerpunkte: vier Spalten */
+  .rows {
+    display: grid;
+    /* Bewusst großzügiger als das Standardraster: Die vier Bereiche
+       sollen als eigenständige Einheiten lesbar bleiben. */
+    gap: var(--s-16) clamp(var(--s-8), 3.5vw, var(--s-16));
+    margin-top: var(--s-16);
+  }
+  @media (min-width: 40rem) { .rows { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 64rem) { .rows { grid-template-columns: repeat(4, 1fr); } }
+
+  /* Keine Kartenfläche und keine Rundung: Auf dunklem Grund stehen die
+     Bilder frei, der Text darunter. Das hält B von der Kartenlogik der
+     Variante C getrennt, obwohl beide vier Spalten zeigen. */
+  .row__link {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: var(--s-6);
+    height: 100%;
+    text-decoration: none;
+  }
+
+  .row__media { position: relative; display: block; overflow: hidden; }
+
+  /*
+   * Ersetzt die Beschriftung „Mehr dazu". Kein Kasten — stattdessen ein
+   * Verlauf aus der unteren rechten Ecke, damit der Pfeil auf jedem Motiv
+   * trägt. Gerechnet gegen den hellsten denkbaren Bildpunkt (#FCFEFF):
+   * bei 0,72 Deckkraft bleibt ein Grund von ~#5F6266, der Pfeil erreicht
+   * darauf 4,94:1 — grafische Elemente brauchen 3:1.
+   */
+  .row__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to top left,
+      rgba(34, 38, 42, 0.72) 0%,
+      rgba(34, 38, 42, 0.42) 14%,
+      rgba(34, 38, 42, 0.12) 26%,
+      rgba(34, 38, 42, 0) 40%
+    );
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease);
+  }
+
+  .row__arrow {
+    position: absolute;
+    /* Über dem Verlauf: ::after wird nach den echten Kindern gemalt und
+       würde den Pfeil sonst verdecken. */
+    z-index: 1;
+    right: var(--s-4);
+    bottom: var(--s-4);
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    color: #E7E7E3;   /* liegt immer auf dem dunklen Eckverlauf */
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .row__arrow :global(.icon) { width: 1.5rem; height: 1.5rem; }
+
+  .row__link:hover .row__media::after,
+  .row__link:focus-visible .row__media::after { opacity: 1; }
+
+  .row__link:hover .row__arrow,
+  .row__link:focus-visible .row__arrow {
+    opacity: 1;
+    transform: translateX(3px);
+  }
+
+  /* Ohne Hover — also auf dem Telefon — gibt es keinen Zustand, in dem der
+     Hinweis erscheinen könnte. Dort steht er dauerhaft. */
+  @media (hover: none) {
+    .row__media::after,
+    .row__arrow { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .row__link:hover .row__arrow,
+    .row__link:focus-visible .row__arrow { transform: none; }
+  }
+  .row__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    object-position: 50% 24%;
+    transition: transform 700ms var(--ease);
+  }
+  .row__link:hover .row__img { transform: scale(1.04); }
+
+  .row__body {
+    display: grid;
+    gap: var(--s-2);
+    align-content: start;
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--border);
+  }
+
+  .row__kicker { color: var(--text-muted); }
+
+  .row__title {
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-light);
+    line-height: var(--lh-snug);
+    letter-spacing: -0.01em;
+  }
+
+  .row__text {
+    margin-top: var(--s-2);
+    font-size: var(--fs-small);
+    color: var(--text-secondary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .row__link:hover .row__img { transform: none; }
+  }
+
+  /* --------------------------------------------- Leistungsspektrum */
+  /*
+   * Vorher standen Gruppe und Punkte nebeneinander in einer breiten Zeile.
+   * Über die volle Fensterbreite wurde daraus eine sehr lange Laufzeile,
+   * die das Auge nicht mehr greifen konnte. Jetzt dieselbe gestapelte Form
+   * wie auf dem Telefon — Gruppe oben, Punkte darunter — nur in Spalten.
+   */
+  .spektrum {
+    display: grid;
+    gap: var(--s-12) clamp(var(--s-8), 3.5vw, var(--s-16));
+  }
+  @media (min-width: 40rem) { .spektrum { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 64rem) { .spektrum { grid-template-columns: repeat(3, 1fr); } }
+
+  .spektrum__row { display: grid; gap: var(--s-4); align-content: start; }
+
+  .spektrum__group {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    color: var(--text-primary);
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .spektrum__icon { width: 1.125rem; height: 1.125rem; color: var(--icon); }
+
+  .spektrum__items {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--fs-small);
+    line-height: 1.7;
+  }
+
+  /* ------------------------------------------------------------- Vita */
+  .vita + .vita { margin-top: var(--s-16); }
+  .vita__group {
+    padding-bottom: var(--s-4);
+    border-bottom: 1px solid var(--border-strong);
+    color: var(--text-primary);
+  }
+  .vita__list { margin-top: var(--s-8); display: grid; gap: var(--s-8); }
+
+  .vita__item {
+    display: grid;
+    gap: var(--s-2) var(--s-8);
+  }
+  @media (min-width: 45rem) {
+    .vita__item { grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); align-items: baseline; }
+  }
+
+  /* Die Jahreszahl ist hier Gestaltungselement, nicht Beschriftung */
+  .vita__jahr {
+    font-size: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+    font-weight: var(--fw-light);
+    letter-spacing: -0.01em;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .vita__body { display: grid; gap: var(--s-1); }
+  .vita__ort { color: var(--text-secondary); }
+
+  .quali {
+    margin-top: var(--s-24);
+    padding-top: var(--s-8);
+    border-top: 1px solid var(--border);
+    font-size: var(--fs-small);
+    color: var(--text-secondary);
+    max-width: 52rem;
+  }
+  /* Trenner: rein dekorativ, aber als Text gerendert – deshalb auf
+     einen Ton, der die 4,5:1 trotzdem hält (Sage, 4,92:1 auf dem Grund). */
+  .quali__sep { color: var(--text-muted); }
+
+  /* ------------------------------------------- Helles Band: Zäsur */
+  .bright {
+    background: var(--surface-bright);
+    color: var(--text-on-bright);
+  }
+  .bright__label { color: var(--text-on-bright-2); }
+  .bright__title { color: var(--text-on-bright); }
+
+  /* Zwei Praxen, zwei Spalten: nebeneinander gelesen stehen die Orte
+     gleichrangig da statt in einer Rangfolge untereinander. Die Linie
+     gehoert jeweils zur Spalte und schliesst sie nach unten ab. */
+  .orte { display: grid; }
+  .ort { border-bottom: 1px solid var(--border-on-bright); }
+
+  /* Die ganze Karte ist der Link; der Pfeil sitzt unten und ersetzt
+     eine Beschriftung. Linie und Text stehen auf derselben Breite,
+     deshalb keine seitliche Polsterung. */
+  .ort__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    padding-block: var(--s-8);
+    text-decoration: none;
+    color: inherit;
+  }
+  @media (min-width: 60rem) {
+    .orte {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--s-16);
+    }
+    /* Getrennt werden die beiden Spalten allein durch den Abstand.
+       Gleiche Hoehe, damit die Pfeile beider Karten auf einer Linie stehen. */
+    .ort__inner { height: 100%; }
+  }
+
+  .ort__seit { color: var(--text-on-bright-2); }
+  .ort__main { display: grid; gap: var(--s-1); }
+  .ort__name { font-size: var(--fs-h3); font-weight: var(--fw-light); }
+  .ort__inhaber, .ort__schwerpunkt { color: var(--text-on-bright-2); }
+
+  .ort__arrow {
+    color: var(--text-on-bright-2);
+    align-self: start;
+    margin-block-start: auto;
+    padding-block-start: var(--s-2);
+  }
+  .ort__arrow :global(.icon) { width: 1.5rem; height: 1.5rem; }
+  a.ort__inner .ort__arrow {
+    transition: transform var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  a.ort__inner:hover .ort__arrow {
+    transform: translateX(4px);
+    color: var(--text-on-bright);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    a.ort__inner:hover .ort__arrow { transform: none; }
+  }
+
+  /* ------------------------------------ Hinweis im hellen Band */
+  .note {
+    max-width: 42rem;
+    margin-top: var(--s-12);
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    color: var(--text-on-bright-2);
+  }
+</style>

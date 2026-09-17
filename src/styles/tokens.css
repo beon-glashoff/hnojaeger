@@ -1,0 +1,98 @@
+/* ==========================================================================
+   Design-Tokens — Dr. Anne Jäger
+   Grundlage: 260825_HNO_AJ_CD_Manual.pdf (August 2026)
+   Alle Zusatztöne sind Mischungen aus Anthrazit / Sage / Light Sage.
+   Es kommt keine neue Markenfarbe hinzu.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* --- Markenfarben (CD-Manual, unverändert) --------------------------- */
+  --c-anthrazit:   #373D42;  /* CMYK 73/59/51/55 · RGB 55 61 66   */
+  --c-sage:        #A09D93;  /* CMYK 38/30/37/12 · RGB 160 157 147 */
+  --c-light-sage:  #E7E7E3;  /* CMYK 11/8/11/0   · RGB 231 231 227 */
+
+  /* --- Text ------------------------------------------------------------ */
+  --text-primary:   var(--c-anthrazit);  /* 11,00:1 auf Weiß */
+  --text-secondary: #616362;             /*  6,05:1 auf Weiß · Sage + 60 % Anthrazit */
+  --text-muted:     #767773;             /*  4,51:1 auf Weiß · nur ≥16px, nur auf Weiß */
+  --text-on-dark:   var(--c-light-sage); /*  8,87:1 auf Anthrazit */
+  --text-on-dark-2: #B5B3AB;             /*  5,24:1 auf Anthrazit · Sage + 30 % Light Sage
+                                             Sekundärtext auf dunklen Flächen        */
+  --text-on-dark-3: var(--c-sage);       /*  4,05:1 auf Anthrazit · NUR Großtext ≥24px
+                                             und dekorative Grafik, nie Fließtext    */
+
+  /* --- Flächen --------------------------------------------------------- */
+  --surface:        #FFFFFF;
+  --surface-subtle: #FAFAF8;
+  --surface-sage:   var(--c-light-sage);
+  --surface-dark:   var(--c-anthrazit);
+
+  /* --- Linien ---------------------------------------------------------- */
+  --border:        #D2D1CB;  /* Light Sage + 30 % Sage */
+  --border-strong: #C4C2BB;  /* Light Sage + 50 % Sage */
+  --border-dark:   #4E5359;  /* auf Anthrazit-Flächen  */
+
+  /* --- Funktional ------------------------------------------------------ */
+  --icon:  #767773;          /* 4,51:1 – bedeutungstragende Icons */
+  --focus: var(--c-anthrazit);
+
+  /* --- Typografie ------------------------------------------------------ */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --fw-light:  300;
+  --fw-normal: 400;
+  --fw-medium: 500;
+
+  /* Fluid von Mobil → Desktop, Werte aus 02_Designsystem.md, Abschnitt 4 */
+  --fs-display: clamp(2.125rem, 1.30rem + 3.55vw, 3.5rem);   /* 34 → 56 */
+  --fs-h2:      clamp(1.625rem, 1.33rem + 1.29vw, 2.25rem);  /* 26 → 36 */
+  --fs-h3:      clamp(1.25rem,  1.16rem + 0.39vw, 1.5rem);   /* 20 → 24 */
+  --fs-lead:    clamp(1.1875rem,1.13rem + 0.26vw, 1.3125rem);/* 19 → 21 */
+  --fs-body:    clamp(1.0625rem,1.04rem + 0.13vw, 1.125rem); /* 17 → 18 */
+  --fs-small:   0.9375rem;                                    /* 15 */
+  --fs-label:   0.8125rem;                                    /* 13 */
+
+  --lh-tight: 1.1;
+  --lh-head:  1.2;
+  --lh-snug:  1.3;
+  --lh-lead:  1.55;
+  --lh-body:  1.65;
+
+  --ls-display: -0.02em;
+  --ls-h2:      -0.01em;
+  --ls-label:    0.16em;   /* das typografische Markenzeichen */
+
+  --measure: 34rem;        /* 62–72 Zeichen */
+
+  /* --- Abstände (4-px-Basis) ------------------------------------------- */
+  --s-1: 0.25rem;  --s-2: 0.5rem;   --s-3: 0.75rem;  --s-4: 1rem;
+  --s-6: 1.5rem;   --s-8: 2rem;     --s-12: 3rem;    --s-16: 4rem;
+  --s-24: 6rem;    --s-32: 8rem;    --s-40: 10rem;
+
+  --section-y: clamp(6rem, 3.5rem + 10vw, 10rem);   /* 96 → 160 */
+  --header-h:  5.5rem;                              /* Höhe der Kopfleiste */
+  --gutter:    clamp(1.5rem, 0.6rem + 3.6vw, 5rem); /* 24 → 80  */
+
+  /* --- Raster ---------------------------------------------------------- */
+  --container:      75rem;    /* 1200 */
+  --container-wide: 90rem;    /* 1440 */
+  --gap: 1.5rem;              /* 24 */
+
+  /* --- Formen ---------------------------------------------------------- */
+  --radius-0: 0;
+  --radius-field: 2px;
+  --radius-pill: 9999px;
+  /* Varianten A und B bleiben eckig; Variante „Sand" überschreibt diese zwei. */
+  --radius-card: 0;
+  --radius-media: 0;
+
+  /* --- Bewegung -------------------------------------------------------- */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur:  400ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 1ms; }
+}

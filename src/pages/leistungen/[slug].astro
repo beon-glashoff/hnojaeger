@@ -1,0 +1,477 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import Disclaimer from '../../components/Disclaimer.astro';
+import Autorenzeile from '../../components/Autorenzeile.astro';
+import { site } from '../../data/site';
+import { schwerpunkte } from '../../data/content';
+import { leistungen, leistungenSortiert } from '../../data/leistungen';
+
+export function getStaticPaths() {
+  return leistungen.map((l) => ({ params: { slug: l.slug }, props: { leistung: l } }));
+}
+
+const { leistung } = Astro.props;
+const bild = schwerpunkte.find((s) => s.slug === leistung.slug)!;
+const bildZu = (slug: string) => schwerpunkte.find((s) => s.slug === slug)!;
+const andere = leistungenSortiert.filter((l) => l.slug !== leistung.slug);
+
+/** Datum der letzten fachlichen Prüfung. Beim Freigeben setzen. */
+const geprueft = '2026-09-17';
+
+const seitenUrl = new URL(`/leistungen/${leistung.slug}/`, site.url).href;
+const personId = `${site.url}/#anne-jaeger`;
+
+const schema = [
+  {
+    '@type': 'MedicalWebPage',
+    '@id': `${seitenUrl}#seite`,
+    url: seitenUrl,
+    name: leistung.title,
+    description: leistung.description,
+    inLanguage: 'de-DE',
+    lastReviewed: geprueft,
+    reviewedBy: { '@id': personId },
+    about: { '@type': 'MedicalEntity', name: leistung.h1 },
+    isPartOf: { '@id': `${site.url}/#website` },
+  },
+  {
+    '@type': 'FAQPage',
+    '@id': `${seitenUrl}#faq`,
+    mainEntity: leistung.faq.map((f) => ({
+      '@type': 'Question',
+      name: f.frage,
+      acceptedAnswer: { '@type': 'Answer', text: f.antwort },
+    })),
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Startseite', item: `${site.url}/` },
+      { '@type': 'ListItem', position: 2, name: 'Leistungen', item: `${site.url}/leistungen/` },
+      { '@type': 'ListItem', position: 3, name: leistung.navTitel, item: seitenUrl },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  variant="dunkel"
+  modeToggle
+  title={`${leistung.title} | ${site.nameShort}`}
+  description={leistung.description}
+  schema={schema}
+>
+  <article>
+    {/* ================================================ Split-Hero */}
+    <header class="hero">
+      <div class="container hero__inner">
+        <div class="hero__text">
+          {/* Statt Brotkrumen ein Rückweg: Wer auf einer Fachseite landet,
+              braucht einen Weg zur Übersicht — nicht die Kette dorthin. */}
+          <a href="/leistungen/" class="label zurueck">
+            <Icon name="arrow-narrow-left" />
+            <span>Alle Leistungen</span>
+          </a>
+          <h1 class="display hero__h1">{leistung.h1}</h1>
+          <p class="lead hero__lead">{leistung.lead}</p>
+        </div>
+
+        <div class="hero__media">
+          <Picture
+            src={bild.bild}
+            alt={bild.bildAlt}
+            widths={[540, 760, 1080, 1400]}
+            sizes="(min-width: 60rem) 44vw, 100vw"
+            formats={['avif', 'webp']}
+            fallbackFormat="jpeg"
+            quality={74}
+            loading="eager"
+            fetchpriority="high"
+            pictureAttributes={{ class: 'hero__pic' }}
+            class="hero__img"
+          />
+        </div>
+      </div>
+    </header>
+
+    {/* ============================ Inhalt: eine zentrierte Spalte */}
+    <div class="papier">
+      <div class="container">
+        <div class="spalte">
+          {/* Der Einstiegskasten trägt die Merkmale – das ist, was jemand
+              zuerst sucht, der auf dieser Seite landet. Als Überschrift
+              steht die Formulierung der jeweiligen Leistung, nicht ein
+              allgemeines „Auf einen Blick": Bei Kinder-HNO heißt der
+              Abschnitt „Woran Eltern es bemerken". */}
+          <section class="kasten kasten--gefuellt">
+            <h2 class="label kasten__titel">{leistung.erkennen.titel}</h2>
+            <ul class="merkmale merkmale--eng">
+              {leistung.erkennen.punkte.map((p) => (
+                <li class="merkmal">
+                  <Icon name="arrow-narrow-right" class="merkmal__icon" />
+                  <span>{p}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section class="block">
+            <h2 class="h2 block__titel">{leistung.vorgehen.titel}</h2>
+            <div class="prose">
+              {leistung.vorgehen.absaetze.map((t) => <p>{t}</p>)}
+            </div>
+          </section>
+
+          <section class="block">
+            <h2 class="h2 block__titel">{leistung.ursachen.titel}</h2>
+            <div class="prose">
+              {leistung.ursachen.absaetze.map((t) => <p>{t}</p>)}
+            </div>
+          </section>
+
+          <section class="kasten kasten--rahmen">
+            <h2 class="label kasten__titel">{leistung.abklaeren.titel}</h2>
+            <p class="kasten__text small">{leistung.abklaeren.text}</p>
+            <ul class="merkmale merkmale--eng">
+              {leistung.abklaeren.punkte.map((p) => (
+                <li class="merkmal">
+                  <Icon name="arrow-narrow-right" class="merkmal__icon" />
+                  <span>{p}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <Disclaimer />
+          <Autorenzeile geprueft={geprueft} />
+        </div>
+      </div>
+    </div>
+
+    {/* ============================ Häufige Fragen: eigene Sektion, voll */}
+    <section class="section faq-sektion" aria-labelledby="faq-titel">
+      <div class="container">
+        <p class="label">Häufige Fragen</p>
+        <h2 class="h2 faq__ueberschrift" id="faq-titel">{leistung.navTitel} — kurz beantwortet</h2>
+
+        <div class="faq">
+          {leistung.faq.map((f) => (
+            <details class="faq__eintrag">
+              <summary class="faq__frage">
+                <span>{f.frage}</span>
+                <Icon name="chevron-down" class="faq__chevron" />
+              </summary>
+              <p class="faq__antwort small">{f.antwort}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ============================================ Weitere Schwerpunkte */}
+    <nav class="section weiter" aria-label="Weitere Schwerpunkte">
+      <div class="container">
+        <p class="label">Weitere Schwerpunkte</p>
+        <ul class="weiter__liste">
+          {andere.map((l) => {
+            const b = bildZu(l.slug);
+            return (
+              <li>
+                <a href={`/leistungen/${l.slug}/`} class="weiter__link">
+                  <span class="weiter__media">
+                    <Picture
+                      src={b.bild}
+                      alt={b.bildAlt}
+                      widths={[400, 600, 800]}
+                      sizes="(min-width: 45rem) 30vw, 100vw"
+                      formats={['avif', 'webp']}
+                      fallbackFormat="jpeg"
+                      quality={72}
+                      loading="lazy"
+                      class="weiter__img"
+                    />
+                    {/* Reihenfolge zählt: Der Schleier steht vor dem Pfeil
+                        im Markup, sonst legt er sich darüber. */}
+                    <span class="weiter__schleier" aria-hidden="true"></span>
+                    <span class="weiter__pfeil"><Icon name="arrow-narrow-right" /></span>
+                  </span>
+                  <span class="weiter__body">
+                    <span class="label weiter__kicker">{b.kurz}</span>
+                    <span class="weiter__titel">{l.navTitel}</span>
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .container { max-width: none; }
+
+  /* ------------------------------------------------------- Split-Hero */
+  /* Eine feine Linie über die volle Breite schließt den Bereich ab. */
+  .hero {
+    padding-block: clamp(var(--s-8), 4vw, var(--s-16)) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: var(--s-12);
+    align-items: center;
+  }
+
+  .zurueck {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--dur) var(--ease);
+  }
+  .zurueck :global(.icon) {
+    width: 1.125rem;
+    height: 1.125rem;
+    transition: transform var(--dur) var(--ease);
+  }
+  .zurueck:hover { color: var(--text-primary); }
+  .zurueck:hover :global(.icon) { transform: translateX(-3px); }
+  @media (prefers-reduced-motion: reduce) {
+    .zurueck:hover :global(.icon) { transform: none; }
+  }
+
+  .hero__h1 { margin-top: var(--s-6); max-width: 18ch; }
+  .hero__lead { margin-top: var(--s-8); max-width: 36rem; color: var(--text-secondary); }
+
+  /* --- Bild: erst die schmale Fassung, dann der Desktop-Fall ---------- */
+  .hero :global(.hero__pic) { display: block; }
+  .hero__img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: 50% 24%;
+  }
+  @media (max-width: 59.999rem) {
+    .hero__media { margin-inline: calc(var(--gutter) * -1); }
+  }
+
+  @media (min-width: 60rem) {
+    /*
+     * Auf dem Desktop füllt der Hero den Rest des Fensters unter der
+     * Kopfleiste, und das Bild füllt ihn ganz: oben bündig am Menü,
+     * unten bündig an der Abschlusslinie, rechts an der Außenkante.
+     */
+    .hero {
+      min-height: calc(100svh - var(--header-h));
+      padding-block: 0;
+    }
+    .hero__inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+      gap: clamp(var(--s-12), 5vw, var(--s-24));
+      min-height: calc(100svh - var(--header-h));
+      padding-block: 0;
+    }
+
+    .hero__text { padding-block: var(--s-16); }
+
+    /*
+     * Absolut gefüllt statt im Fluss: Sonst bestimmt das Seitenverhältnis
+     * des Bildes die Zeilenhöhe des Rasters und der Hero wird höher als
+     * das Fenster (gemessen 923 px statt 812 px).
+     */
+    .hero__media {
+      align-self: stretch;
+      position: relative;
+      min-height: 0;
+      margin-right: calc(var(--gutter) * -1);
+      margin-inline-start: 0;
+    }
+    .hero :global(.hero__pic) { position: absolute; inset: 0; }
+    .hero__img { height: 100%; aspect-ratio: auto; }
+  }
+
+  /* --------------------------------------------------- Textfläche hell */
+  /*
+   * Der Fließtext steht in beiden Farbmodi auf hellem Grund. Helle Schrift
+   * auf dunklem Grund liest sich über mehrere Bildschirme spürbar
+   * anstrengender – für einen Ratgebertext der falsche Handel.
+   */
+  .papier {
+    padding-block: var(--section-y);
+    background: var(--surface-paper);
+    color: var(--text-on-paper);
+  }
+
+  /* Eine zentrierte Spalte, redaktionell etwas breiter als das
+     Standardmaß – aber nicht so breit, dass die Zeilen zu lang werden. */
+  .spalte {
+    max-width: 44rem;
+    margin-inline: auto;
+  }
+
+  .block + .block { margin-top: var(--s-24); }
+  .block__titel { margin-bottom: var(--s-8); max-width: 26ch; }
+
+  .prose p { max-width: 40rem; }
+  .prose p + p { margin-top: var(--s-6); }
+  .prose { color: var(--text-on-paper-2); }
+
+  .merkmale { display: grid; gap: var(--s-4); }
+  .merkmale--eng { margin-top: var(--s-6); gap: var(--s-3); }
+
+  .merkmal {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--s-3);
+    align-items: start;
+    color: var(--text-on-paper-2);
+  }
+  .merkmal__icon {
+    color: var(--text-on-paper-muted);
+    margin-top: 0.3em;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  /* ------------------------------------------------------------ Kästen */
+  .kasten { padding: clamp(var(--s-6), 3vw, var(--s-8)); }
+  .kasten + .block,
+  .block + .kasten { margin-top: var(--s-24); }
+
+  .kasten__titel { color: var(--text-on-paper); }
+  .kasten__text { margin-top: var(--s-4); color: var(--text-on-paper-2); }
+  .kasten .merkmale { margin-top: var(--s-6); }
+
+  /* Gefüllt: der Einstiegskasten mit den Merkmalen. */
+  .kasten--gefuellt {
+    background: color-mix(in srgb, var(--surface-paper) 70%, #FFFFFF);
+  }
+
+  /* Nur Rahmen – dieselbe Anmutung wie das Kurzprofil, das hier
+     entfallen ist. Der Abschnitt markiert den Übergang vom Erklären
+     ins Handeln und soll sich absetzen, ohne zu drängen. */
+  .kasten--rahmen {
+    border: 1px solid var(--border-on-paper);
+  }
+
+  /* --------------------------------- Häufige Fragen: volle Breite */
+  /* Gleiche Anmutung wie die Leistungstabelle der Startseite:
+     Haarlinien, Versal-Label, keine Kästen. */
+  .faq__ueberschrift { margin-top: var(--s-4); margin-bottom: var(--s-16); }
+
+  .faq { border-top: 1px solid var(--border); }
+  .faq__eintrag { border-bottom: 1px solid var(--border); }
+
+  .faq__frage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--s-6);
+    align-items: center;
+    padding-block: var(--s-6);
+    cursor: pointer;
+    list-style: none;
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-light);
+  }
+  .faq__frage::-webkit-details-marker { display: none; }
+
+  .faq__chevron {
+    color: var(--icon);
+    flex: none;
+    transition: transform var(--dur) var(--ease);
+  }
+  .faq__eintrag[open] .faq__chevron { transform: rotate(180deg); }
+
+  .faq__antwort {
+    max-width: 44rem;
+    padding-bottom: var(--s-8);
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .faq__eintrag[open] .faq__chevron { transition: none; }
+  }
+
+  /* ------------------------------------------------ Weitere Schwerpunkte */
+  /* Unten weniger Luft als oben – die Sektion schließt die Seite ab,
+     darunter folgt direkt der Footer. */
+  .weiter {
+    background: var(--surface-subtle);
+    padding-bottom: clamp(var(--s-12), 2rem + 4vw, var(--s-16));
+  }
+
+  /* Derselbe Spaltenabstand wie die Schwerpunkte auf der Startseite. */
+  .weiter__liste {
+    display: grid;
+    gap: var(--s-16) clamp(var(--s-8), 3.5vw, var(--s-16));
+    margin-top: var(--s-12);
+  }
+  @media (min-width: 45rem) { .weiter__liste { grid-template-columns: repeat(3, 1fr); } }
+
+  .weiter__link { display: grid; gap: var(--s-4); text-decoration: none; }
+
+  .weiter__media { position: relative; display: block; overflow: hidden; }
+  .weiter__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 22%;
+    transition: transform 700ms var(--ease);
+  }
+  .weiter__link:hover .weiter__img { transform: scale(1.04); }
+
+  /* Nur noch ein Eckverlauf unten rechts – er trägt den Pfeil.
+     Der Rest des Motivs bleibt unangetastet. */
+  .weiter__schleier {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      46% 26% at 100% 100%,
+      rgba(34, 38, 42, 0.74) 0%,
+      rgba(34, 38, 42, 0.38) 46%,
+      rgba(34, 38, 42, 0) 76%
+    );
+  }
+
+  .weiter__pfeil {
+    position: absolute;
+    right: var(--s-4);
+    bottom: var(--s-4);
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    color: #E7E7E3;
+    transition: transform var(--dur) var(--ease);
+  }
+  .weiter__pfeil :global(.icon) { width: 1.375rem; height: 1.375rem; }
+  .weiter__link:hover .weiter__pfeil { transform: translateX(3px); }
+
+  /* Aufbau wie die Schwerpunkte der Startseite: Eyebrow über dem Titel. */
+  .weiter__body {
+    display: grid;
+    gap: var(--s-2);
+    align-content: start;
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--border);
+  }
+  /* --text-muted trägt auf der gedämpften Fläche im hellen Modus nicht
+     (4,32:1 bei 13 px). Der Sekundärton hält in beiden Modi. */
+  .weiter__kicker { color: var(--text-secondary); }
+  .weiter__titel { font-size: var(--fs-h3); font-weight: var(--fw-light); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .weiter__link:hover .weiter__img,
+    .weiter__link:hover .weiter__pfeil { transform: none; }
+  }
+</style>

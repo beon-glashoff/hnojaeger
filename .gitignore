@@ -1,0 +1,19 @@
+# build
+dist/
+.astro/
+
+# deps
+node_modules/
+
+# env & cloudflare
+.env
+.env.production
+.dev.vars
+.wrangler/
+
+# os
+.DS_Store
+
+# Designvarianten: bleiben lokal zum Vergleich, gehen aber nicht live.
+# Siehe README, Abschnitt "Designvarianten".
+src/pages/varianten/

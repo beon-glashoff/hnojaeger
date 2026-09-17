@@ -1,0 +1,218 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { site } from '../../data/site';
+import { schwerpunkte, leistungsspektrum } from '../../data/content';
+import { leistungenSortiert } from '../../data/leistungen';
+
+const bildZu = (slug: string) => schwerpunkte.find((s) => s.slug === slug)!;
+
+const schema = [
+  {
+    '@type': 'CollectionPage',
+    '@id': `${site.url}/leistungen/#seite`,
+    url: `${site.url}/leistungen/`,
+    name: 'Leistungen',
+    inLanguage: 'de-DE',
+    isPartOf: { '@id': `${site.url}/#website` },
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Startseite', item: `${site.url}/` },
+      { '@type': 'ListItem', position: 2, name: 'Leistungen', item: `${site.url}/leistungen/` },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  variant="dunkel"
+  modeToggle
+  title={`Leistungen – ${site.name}, HNO-Fachärztin`}
+  description="Das konservative HNO-Spektrum von Allergiediagnostik über Audiometrie und Sonografie bis zur schlafmedizinischen Abklärung – im Überblick."
+  schema={schema}
+>
+  <section class="section einstieg">
+    <div class="container">
+      <nav class="krumen small" aria-label="Brotkrumen">
+        <a href="/">Start</a>
+      </nav>
+      <p class="label einstieg__label">Leistungen</p>
+      <h1 class="display einstieg__h1">Das konservative HNO-Spektrum</h1>
+      <p class="lead einstieg__lead">
+        Vier Bereiche mit besonderer Tiefe, dazu das vollständige konservative
+        Spektrum der Hals-Nasen-Ohrenheilkunde. Operative Eingriffe gehören
+        nicht dazu.
+      </p>
+    </div>
+  </section>
+
+  {/* ------------------------------------------------------ Schwerpunkte */}
+  <section class="section section--subtle" aria-labelledby="schwerpunkte-titel">
+    <div class="container">
+      <p class="label">Schwerpunkte</p>
+      <h2 class="h2 sec__titel" id="schwerpunkte-titel">Vier Bereiche in der Tiefe</h2>
+
+      <ul class="karten reveal">
+        {leistungenSortiert.map((l) => {
+          const bild = bildZu(l.slug);
+          return (
+            <li class="karte">
+              <a href={`/leistungen/${l.slug}/`} class="karte__link">
+                <span class="karte__media">
+                  <Picture
+                    src={bild.bild}
+                    alt={bild.bildAlt}
+                    widths={[360, 540, 760]}
+                    sizes="(min-width: 64rem) 24vw, (min-width: 40rem) 46vw, 100vw"
+                    formats={['avif', 'webp']}
+                    fallbackFormat="jpeg"
+                    quality={72}
+                    loading="lazy"
+                    class="karte__img"
+                  />
+                </span>
+                <span class="karte__body">
+                  <span class="karte__titel">{l.navTitel}</span>
+                  <span class="karte__text">{l.teaser}</span>
+                  <span class="arrow-link karte__cta">
+                    <span>Zum Thema</span>
+                    <Icon name="arrow-narrow-right" />
+                  </span>
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+
+  {/* --------------------------------------------------- Ganzes Spektrum */}
+  <section class="section" aria-labelledby="spektrum-titel">
+    <div class="container">
+      <p class="label">Vollständige Übersicht</p>
+      <h2 class="h2 sec__titel" id="spektrum-titel">Alle Leistungen</h2>
+
+      <dl class="spektrum reveal">
+        {leistungsspektrum.map((g) => (
+          <div class="spektrum__gruppe">
+            <dt class="label spektrum__name">
+              <Icon name={g.icon} class="spektrum__icon" />
+              <span>{g.titel}</span>
+            </dt>
+            <dd class="spektrum__punkte">
+              <ul>
+                {g.punkte.map((p) => <li>{p}</li>)}
+              </ul>
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <p class="hinweis small reveal">
+        Das Spektrum ist konservativ ausgerichtet. Ist ein operativer Eingriff
+        erforderlich, erfolgt die Weiterleitung an eine geeignete Klinik oder
+        operativ tätige Praxis.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .container { max-width: none; }
+
+  .krumen { color: var(--text-muted); }
+  .krumen a { text-decoration: none; }
+  .krumen a:hover { color: var(--text-primary); }
+
+  .einstieg__label { margin-top: var(--s-8); }
+  .einstieg__h1 { margin-top: var(--s-4); }
+  .einstieg__lead { margin-top: var(--s-8); max-width: 40rem; color: var(--text-secondary); }
+
+  .sec__titel { margin-top: var(--s-4); margin-bottom: var(--s-16); }
+
+  /* ---------------------------------------------------------- Karten */
+  .karten {
+    display: grid;
+    gap: var(--s-16) clamp(var(--s-8), 3.5vw, var(--s-16));
+  }
+  @media (min-width: 40rem) { .karten { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 64rem) { .karten { grid-template-columns: repeat(4, 1fr); } }
+
+  .karte__link {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: var(--s-6);
+    height: 100%;
+    text-decoration: none;
+  }
+  .karte__media { display: block; overflow: hidden; }
+  .karte__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    object-position: 50% 24%;
+    transition: transform 700ms var(--ease);
+  }
+  .karte__link:hover .karte__img { transform: scale(1.04); }
+
+  .karte__body {
+    display: grid;
+    gap: var(--s-2);
+    align-content: start;
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--border);
+  }
+  .karte__titel {
+    font-size: var(--fs-h3);
+    font-weight: var(--fw-light);
+    line-height: var(--lh-snug);
+  }
+  .karte__text { margin-top: var(--s-1); font-size: var(--fs-small); color: var(--text-secondary); }
+  .karte__cta { margin-top: var(--s-4); }
+  .karte__link:hover .karte__cta .icon { transform: translateX(4px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .karte__link:hover .karte__img { transform: none; }
+  }
+
+  /* -------------------------------------------------------- Spektrum */
+  .spektrum {
+    display: grid;
+    gap: var(--s-12) clamp(var(--s-8), 3.5vw, var(--s-16));
+  }
+  @media (min-width: 40rem) { .spektrum { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 64rem) { .spektrum { grid-template-columns: repeat(3, 1fr); } }
+
+  .spektrum__gruppe { display: grid; gap: var(--s-4); align-content: start; }
+  .spektrum__name {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    color: var(--text-primary);
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--border-strong);
+  }
+  .spektrum__icon { width: 1.125rem; height: 1.125rem; color: var(--icon); }
+
+  .spektrum__punkte { margin: 0; }
+  .spektrum__punkte ul { display: grid; }
+  .spektrum__punkte li {
+    padding-block: var(--s-2);
+    font-size: var(--fs-small);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hinweis {
+    max-width: var(--measure);
+    margin-top: var(--s-16);
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+</style>

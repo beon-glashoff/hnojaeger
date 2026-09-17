@@ -120,7 +120,7 @@ const DESKTOP = '(min-width: 48rem)';
       {/* Diese Sektion war als einzige ohne Überschrift – im Dokumentumriss
           eine Lücke zwischen H1 und den folgenden H2. */}
       <p class="label reveal">Schwerpunkte</p>
-      <h2 class="h2 sec__title reveal">Vier Bereiche, die genaueres Hinsehen verlangen</h2>
+      <h2 class="h2 sec__title reveal">Was mir besonders am Herzen liegt</h2>
 
       <ul class="rows reveal">
         {schwerpunkte.map((s) => (
@@ -156,8 +156,8 @@ const DESKTOP = '(min-width: 48rem)';
   {/* ================================================ Leistungsspektrum */}
   <section class="section section--subtle" id="leistungen">
     <div class="container">
-      <p class="label reveal">Leistungen</p>
-      <h2 class="h2 sec__title reveal">Das konservative HNO-Spektrum</h2>
+      <p class="label reveal">Kompetenzen</p>
+      <h2 class="h2 sec__title reveal">Ihre Gesundheit im Fokus</h2>
 
       <dl class="spektrum reveal">
         {leistungsspektrum.map((g) => (
@@ -232,9 +232,14 @@ const DESKTOP = '(min-width: 48rem)';
                 <span class="label ort__seit">{o.seit}</span>
                 <span class="ort__main">
                   <span class="ort__name">{o.praxis}</span>
-                  <span class="small ort__inhaber">{o.inhaber} · {o.ort}</span>
+                  <span class="small ort__inhaber">{o.inhaber}</span>
                 </span>
-                <span class="small ort__schwerpunkt">{o.schwerpunkt}</span>
+                {/* Der Ort steht in der letzten Zeile statt hinter den Inhabern:
+                    Wer die Sprechstunden liest, sucht zuerst, wo das ist. */}
+                <span class="small ort__standort">
+                  <Icon name="map-pin" />
+                  <span>{o.ort}</span>
+                </span>
                 {o.url && <span class="ort__arrow"><Icon name="arrow-narrow-right" /></span>}
               </Wrapper>
             </li>
@@ -671,7 +676,19 @@ const DESKTOP = '(min-width: 48rem)';
   .ort__seit { color: var(--text-on-bright-2); }
   .ort__main { display: grid; gap: var(--s-1); }
   .ort__name { font-size: var(--fs-h3); font-weight: var(--fw-light); }
-  .ort__inhaber, .ort__schwerpunkt { color: var(--text-on-bright-2); }
+  .ort__inhaber { color: var(--text-on-bright-2); }
+
+  .ort__standort {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    color: var(--text-on-bright-2);
+  }
+  .ort__standort :global(.icon) {
+    width: 1.0625rem;
+    height: 1.0625rem;
+    flex: none;
+  }
 
   .ort__arrow {
     color: var(--text-on-bright-2);

@@ -46,7 +46,8 @@ src/
   layouts/         BaseLayout — Meta, strukturierte Daten, Variante, Reveal-Skript
   pages/           index.astro (Hauptvariante), 404.astro
                    varianten/ — abgelegte Designvarianten, nur lokal
-wrangler.jsonc     Cloudflare: Build-Befehl und Static-Asset-Deployment
+scripts/           Aufräumschritt nach dem Build
+wrangler.jsonc     Cloudflare: Static-Asset-Deployment
 ```
 
 **Alles liegt lokal.** Keine externen Schriften, keine CDNs, keine Karten, keine
@@ -74,8 +75,12 @@ Alle drei nutzen dasselbe Designsystem — die Varianten überschreiben nur Toke
 unter `:root[data-variant='…']`. Eine neue Variante braucht daher nur eine
 Theme-Datei plus `variant="…"` am `BaseLayout`.
 
-**Nicht im Repository.** `src/pages/varianten/` steht in `.gitignore` und liegt
-damit nur lokal — auf Cloudflare wird der Ordner nie gebaut. Die Varianten sind
+**Nicht im Repository und nicht im Build.** `src/pages/varianten/` steht in
+`.gitignore` und liegt damit nur lokal — auf Cloudflare wird der Ordner nie
+gebaut. Lokal baut Astro ihn mit, deshalb räumt `npm run build` ihn danach aus
+`dist/` wieder heraus (`scripts/varianten-aus-dist-entfernen.mjs`). Sonst lädt
+ein Deploy vom Entwicklungsrechner die Varianten mit hoch. Im Entwicklungsserver
+bleiben sie unter `/varianten/` erreichbar. Die Varianten sind
 Abstimmungsmaterial und gehören nicht auf einen Produktivserver. Zum Vergleich
 bleiben sie lokal unter `/varianten/` erreichbar.
 

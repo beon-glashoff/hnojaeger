@@ -13,6 +13,12 @@ import { site, kontakt, kammer, impressum } from '../data/site';
  *
  * ENTWURF – vor dem Go-live anwaltlich prüfen lassen. Die mit „noch offen"
  * ausgewiesenen Angaben sind Pflichtangaben und müssen vorher stehen.
+ *
+ * Zur fehlenden Telefonnummer: § 5 Abs. 1 Nr. 2 DDG verlangt neben der
+ * E-Mail-Adresse Angaben, die eine schnelle und unmittelbare Kommunikation
+ * ermöglichen. Der EuGH lässt dafür auch einen anderen zügigen Kanal
+ * genügen, verlangt aber einen zweiten Weg. Mit der E-Mail-Adresse allein
+ * ist diese Stelle angreifbar — das gehört in die anwaltliche Prüfung.
  */
 const anschrift = kontakt.anschrift;
 ---
@@ -46,9 +52,10 @@ const anschrift = kontakt.anschrift;
         </p>
 
         <h2 class="h3">Kontakt</h2>
+        {/* Die Telefonnummer steht hier auf Wunsch nicht mehr. Zur
+            Rechtslage siehe die Anmerkung im Kopf dieser Datei. */}
         <p>
-          E-Mail: <a href={`mailto:${kontakt.email}`} class="link">{kontakt.email}</a><br />
-          Telefon: <a href={`tel:${kontakt.telefonHref}`} class="link">{kontakt.telefon}</a>
+          E-Mail: <a href={`mailto:${kontakt.email}`} class="link">{kontakt.email}</a>
         </p>
         <p class="hinweis">
           Bitte senden Sie per E-Mail keine Angaben zu Ihrer Gesundheit. E-Mail ist

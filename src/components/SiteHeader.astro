@@ -2,7 +2,7 @@
 import { site } from '../data/site';
 import { logoInline } from '../lib/logo';
 import Icon from './Icon.astro';
-import wortmarke from '../assets/logos/wortmarke-fa-anthrazit.svg?raw';
+import bildmarke from '../assets/logos/bildmarke-anthrazit.svg?raw';
 
 interface Props {
   /**
@@ -25,9 +25,11 @@ const nav = [
   { href: '/#sprechstunden', text: 'Sprechstunden' },
 ];
 
-// Wortmarke inline: skaliert scharf, kein zusätzlicher Request,
-// folgt über currentColor dem jeweiligen Theme
-const logo = logoInline(wortmarke, { label: `${site.nameShort}, ${site.roleShort}` });
+// Bildmarke inline: skaliert scharf, kein zusätzlicher Request,
+// folgt über currentColor dem jeweiligen Theme. Das Monogramm trägt den
+// Namen nicht mit — deshalb steht er im aria-label, sonst hiesse der
+// Startseitenlink für Screenreader nur „AJ".
+const logo = logoInline(bildmarke, { label: `${site.nameShort}, ${site.roleShort}` });
 ---
 
 <header class:list={['site-header', overlay && 'site-header--overlay']} data-overlay={overlay ? '' : null}>
@@ -152,9 +154,12 @@ const logo = logoInline(wortmarke, { label: `${site.nameShort}, ${site.roleShort
     padding-block: var(--s-4);
   }
 
-  /* Wortmarke: Höhe steuert die Größe, das SVG bringt sein eigenes Seitenverhältnis mit */
+  /* Bildmarke: Höhe steuert die Größe, das SVG bringt sein eigenes
+     Seitenverhältnis mit. Das Monogramm ist fast quadratisch und wirkt
+     bei gleicher Höhe schwerer als die zweizeilige Wortmarke — deshalb
+     etwas kleiner gesetzt. */
   .site-header__logo :global(svg) {
-    height: 2.25rem;
+    height: 2rem;
     width: auto;
   }
 
@@ -231,7 +236,7 @@ const logo = logoInline(wortmarke, { label: `${site.nameShort}, ${site.roleShort
     .site-header { --header-h: 4rem; }
     .site-header__inner { min-height: 4rem; padding-block: var(--s-3); }
     /* Auf dem Telefon ist die Leiste niedriger – der Hero rechnet mit. */
-    .site-header__logo :global(svg) { height: 1.75rem; }
+    .site-header__logo :global(svg) { height: 1.625rem; }
 
     .burger { display: grid; }
     .site-header.is-open .burger :global(.burger__icon--open) { display: none; }
@@ -283,6 +288,10 @@ const logo = logoInline(wortmarke, { label: `${site.nameShort}, ${site.roleShort
                 border-color var(--dur) var(--ease),
                 backdrop-filter var(--dur) var(--ease);
   }
+  .site-header--overlay .site-header__inner {
+    transition: min-height var(--dur) var(--ease),
+                padding-block var(--dur) var(--ease);
+  }
 
   /*
    * Über dem Bild tragen die Links den vollen Textton, nicht den
@@ -312,6 +321,37 @@ const logo = logoInline(wortmarke, { label: `${site.nameShort}, ${site.roleShort
 
   .site-header--overlay.is-stuck,
   .site-header--overlay.is-open { color: var(--text-primary); }
+
+  /*
+   * Über dem Hero steht die Bildmarke groß; sobald der Header hinterlegt
+   * wird, schrumpft sie auf das Maß, das sie auf allen anderen Seiten hat.
+   * Geschaltet wird über dieselbe Klasse, die auch die Fläche einblendet —
+   * also über den Sentinel, nicht über einen zweiten Scroll-Listener.
+   * Der Header ist im Overlay fixiert, die größere Marke verschiebt
+   * deshalb nichts im Seitenfluss.
+   */
+  .site-header--overlay .site-header__logo :global(svg) {
+    height: clamp(2.5rem, 4.5vw, 3.125rem);   /* 50 px auf dem Desktop */
+    transition: height var(--dur) var(--ease);
+  }
+  /*
+   * Die hinterlegte Leiste ist 16 px flacher als die Kopfleiste der
+   * übrigen Seiten: Beim Lesen soll sie möglichst wenig Fenster kosten.
+   * Die Bildmarke bleibt dabei bei 32 px — sie trägt die Höhe nicht, die
+   * Polsterung tut es.
+   */
+  .site-header--overlay.is-stuck .site-header__inner {
+    min-height: calc(var(--header-h) - 1rem);
+    padding-block: var(--s-3);
+  }
+  .site-header--overlay.is-stuck .site-header__logo :global(svg),
+  .site-header--overlay.is-open .site-header__logo :global(svg) {
+    height: 2rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .site-header--overlay .site-header__logo :global(svg),
+    .site-header--overlay .site-header__inner { transition: none; }
+  }
 
   .site-header--overlay.is-stuck .site-header__nav a,
   .site-header--overlay.is-stuck .mode-toggle,

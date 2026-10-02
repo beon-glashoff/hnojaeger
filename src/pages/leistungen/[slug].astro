@@ -3,7 +3,6 @@ import { getImage, Picture } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
 import Disclaimer from '../../components/Disclaimer.astro';
-import Autorenzeile from '../../components/Autorenzeile.astro';
 import { site } from '../../data/site';
 import { schwerpunkte } from '../../data/content';
 import { leistungen, leistungenSortiert } from '../../data/leistungen';
@@ -28,7 +27,7 @@ const andere = leistungenSortiert.filter((l) => l.slug !== leistung.slug);
  * Die Breiten enden bei der Breite der Vorlage (quer 1536, hoch 1024) —
  * darüber hinaus zu rechnen erzeugt größere Dateien ohne mehr Detail.
  */
-const QUER_BREITEN = [540, 760, 1080, 1536];
+const QUER_BREITEN = [540, 760, 1080, 1440];
 const HOCH_BREITEN = [420, 640, 1024];
 
 const bilderIn = (src: ImageMetadata, breiten: number[], format: 'avif' | 'webp') =>
@@ -56,7 +55,11 @@ const srcset = (bilder: { src: string }[], breiten: number[]) =>
 const SCHMAL = '(max-width: 59.999rem)';
 const BREIT = '(min-width: 60rem)';
 
-/** Datum der letzten fachlichen Prüfung. Beim Freigeben setzen. */
+/**
+ * Datum der letzten fachlichen Prüfung. Beim Freigeben setzen.
+ * Sichtbar steht es nicht mehr auf der Seite; es trägt nur noch
+ * `lastReviewed` in den strukturierten Daten.
+ */
 const geprueft = '2026-09-17';
 
 const seitenUrl = new URL(`/leistungen/${leistung.slug}/`, site.url).href;
@@ -108,10 +111,12 @@ const schema = [
       <div class="container hero__inner">
         <div class="hero__text">
           {/* Statt Brotkrumen ein Rückweg: Wer auf einer Fachseite landet,
-              braucht einen Weg zur Übersicht — nicht die Kette dorthin. */}
-          <a href="/leistungen/" class="label zurueck">
+              braucht einen Weg zurück — nicht die Kette dorthin. Ziel ist
+              die Startseite, genauer der Abschnitt mit den vier Bereichen.
+              Die Übersichtsseite /leistungen/ wird nicht mehr verlinkt. */}
+          <a href="/#schwerpunkte" class="label zurueck">
             <Icon name="arrow-narrow-left" />
-            <span>Alle Leistungen</span>
+            <span>Alle Schwerpunkte</span>
           </a>
           <h1 class="display hero__h1">{leistung.h1}</h1>
           <p class="lead hero__lead">{leistung.lead}</p>
@@ -187,7 +192,6 @@ const schema = [
           </section>
 
           <Disclaimer />
-          <Autorenzeile geprueft={geprueft} />
         </div>
       </div>
     </div>
@@ -296,15 +300,15 @@ const schema = [
   .hero__img {
     width: 100%;
     height: auto;
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 16 / 9;
     object-fit: cover;
     object-position: 50% 24%;
   }
   @media (max-width: 59.999rem) {
     .hero__media { margin-inline: calc(var(--gutter) * -1); }
     /*
-     * Das Querformat trägt hier: 3 / 2 ist das Verhältnis der Vorlage
-     * (1536 × 1024), deshalb wird nichts beschnitten und der Bildaufbau
+     * Das Querformat trägt hier: 16 / 9 ist das Verhältnis der Vorlagen
+     * (1672 × 941), deshalb wird nichts beschnitten und der Bildaufbau
      * bleibt, wie er fotografiert wurde. Die Verschiebung nach oben gilt
      * nur dem Hochformat auf dem Desktop.
      */

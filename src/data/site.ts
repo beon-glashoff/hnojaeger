@@ -15,8 +15,12 @@ export const site = {
 
 export const kontakt = {
   email: 'kontakt@hnojaeger.de',
-  /** Festnetz — steht im Impressum, bewusst nicht in der Kontaktsektion.
-   *  Siehe 06_Offene-Punkte.md: private Nummer, kein Patiententelefon. */
+  /**
+   * Festnetz — private Nummer, kein Patiententelefon. Seit dem 02.10.2026
+   * erscheint sie auf der Website nirgends mehr: nicht im Impressum, nicht im
+   * Footer, nicht in der Datenschutzerklärung. Das Feld bleibt als Stammdatum
+   * stehen; wer es wieder ausgibt, trifft damit eine Entscheidung.
+   */
   telefon: '0228 94770078',
   telefonHref: '+4922894770078',
   anschrift: {

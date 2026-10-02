@@ -36,6 +36,28 @@ export interface Schwerpunkt {
 
 export const schwerpunkte: Schwerpunkt[] = [
   {
+    slug: 'allergologie',
+    icon: 'flower',
+    titel: 'Allergologie',
+    kurz: 'Diagnostik und Therapie',
+    bild: allergologieBild,
+    bildQuer: allergologieQuer,
+    bildAlt: 'Frau mit einem Taschentuch vor einem blühenden Zweig',
+    text: 'Die Zusatzbezeichnung Allergologie führe ich seit 2014. Eine gute Allergiediagnostik beantwortet nicht nur die Frage, worauf jemand reagiert, sondern auch, was sich dagegen tun lässt – von der Karenz über die Medikation bis zur Hyposensibilisierung.',
+    kurztext: 'Welche Allergie dahintersteckt und was sich dagegen tun lässt – von der Karenz über die Medikation bis zur Hyposensibilisierung.',
+  },
+  {
+    slug: 'kinder-hno',
+    icon: 'mood-kid',
+    titel: 'Kinder-HNO',
+    kurz: 'Hören, Infekte, Paukenröhrchen',
+    bild: kinderHnoBild,
+    bildQuer: kinderHnoQuer,
+    bildAlt: 'Junge, der beide Hände hinter die Ohren hält, um besser zu hören',
+    text: 'Kinder sagen nicht, dass sie schlecht hören – sie fallen auf, weil sie nicht zuhören. Bei wiederkehrenden Infekten, Paukenergüssen und Hörauffälligkeiten nehme ich mir die Zeit, die eine Untersuchung mit Kindern braucht.',
+    kurztext: 'Kinder sagen nicht, dass sie schlecht hören – sie fallen auf, weil sie nicht zuhören. Abklärung mit der Ruhe, die Kinder brauchen.',
+  },
+  {
     slug: 'schlafmedizin',
     icon: 'zzz',
     titel: 'Schlafmedizin',
@@ -47,28 +69,6 @@ export const schwerpunkte: Schwerpunkt[] = [
     kurztext: 'Schnarchen ist selten nur ein Geräusch. Dahinter können Atemaussetzer stehen – abgeklärt von der Nasenatmung bis zur nächtlichen Messung.',
   },
   {
-    slug: 'allergologie',
-    icon: 'flower',
-    titel: 'Allergologie',
-    kurz: 'Diagnostik und Therapie',
-    bild: allergologieBild,
-    bildQuer: allergologieQuer,
-    bildAlt: 'Frau im Freien, die mit geschlossenen Augen tief durchatmet',
-    text: 'Die Zusatzbezeichnung Allergologie führe ich seit 2014. Eine gute Allergiediagnostik beantwortet nicht nur die Frage, worauf jemand reagiert, sondern auch, was sich dagegen tun lässt – von der Karenz über die Medikation bis zur Hyposensibilisierung.',
-    kurztext: 'Welche Allergie dahintersteckt und was sich dagegen tun lässt – von der Karenz über die Medikation bis zur Hyposensibilisierung.',
-  },
-  {
-    slug: 'kinder-hno',
-    icon: 'mood-kid',
-    titel: 'Kinder-HNO',
-    kurz: 'Hören, Infekte, Paukenröhrchen',
-    bild: kinderHnoBild,
-    bildQuer: kinderHnoQuer,
-    bildAlt: 'Junge mit Kopfhörern sitzt auf einem Sofa und hört zu',
-    text: 'Kinder sagen nicht, dass sie schlecht hören – sie fallen auf, weil sie nicht zuhören. Bei wiederkehrenden Infekten, Paukenergüssen und Hörauffälligkeiten nehme ich mir die Zeit, die eine Untersuchung mit Kindern braucht.',
-    kurztext: 'Kinder sagen nicht, dass sie schlecht hören – sie fallen auf, weil sie nicht zuhören. Abklärung mit der Ruhe, die Kinder brauchen.',
-  },
-  {
     slug: 'aesthetische-medizin',
     icon: 'sparkles',
     titel: 'Ästhetische Medizin',
@@ -76,8 +76,8 @@ export const schwerpunkte: Schwerpunkt[] = [
     bild: aesthetikBild,
     bildQuer: aesthetikQuer,
     bildAlt: 'Ärztin behandelt die Stirnpartie einer Patientin',
-    text: 'Die Gesichtsanatomie kenne ich aus der HNO-Ausbildung, nicht aus einer Wochenendschulung. Das ist der Unterschied, auf den es bei einer Faltenbehandlung mit Botulinumtoxin ankommt – zurückhaltend dosiert und mit realistischer Erwartung.',
-    kurztext: 'Faltenbehandlung mit Botulinumtoxin aus fachärztlicher Hand – zurückhaltend dosiert, mit realistischer Erwartung.',
+    text: 'Die Gesichtsanatomie kenne ich aus der HNO-Ausbildung, nicht aus einer Wochenendschulung. Das ist der Unterschied, auf den es bei einer Faltenbehandlung mit Botulinumtoxin ankommt – zurückhaltend dosiert und auf den einzelnen Muskel gerechnet.',
+    kurztext: 'Faltenbehandlung mit Botulinumtoxin aus fachärztlicher Hand – zurückhaltend dosiert, mit Kenntnis der Gesichtsanatomie.',
   },
 ];
 
@@ -95,8 +95,22 @@ export const leistungsspektrum: LeistungsGruppe[] = [
     punkte: [
       'Behinderte Nasenatmung',
       'Nasennebenhöhlenentzündung',
-      'Allergiediagnostik',
-      'Allergietherapie',
+    ],
+  },
+  /*
+   * Eigene Gruppe statt zweier Punkte unter „Nase und Nebenhöhlen": Die
+   * Zusatzbezeichnung führt sie seit 2014, und wer die Schlagwörter nur
+   * überfliegt, findet den Weg von der Anamnese bis zur Immuntherapie hier
+   * auf einen Blick. Gewünscht in der Mail vom 27.09.2026.
+   */
+  {
+    titel: 'Allergologie',
+    icon: 'flower',
+    punkte: [
+      'Anamnese',
+      'Pricktestung',
+      'Blutuntersuchung (RAST-Test)',
+      'Hyposensibilisierung\u00A0/\u00A0Immuntherapie',
     ],
   },
   {
@@ -140,10 +154,21 @@ export const leistungsspektrum: LeistungsGruppe[] = [
       'Atemwegsbeschwerden',
     ],
   },
+  /*
+   * Benannt nach dem Wirkstoff, nicht nach dem Markennamen und nicht nach
+   * einem der beiden Einsatzgebiete: Unter Botulinumtoxin stehen die
+   * ästhetische Anwendung und die Behandlung bei chronischer Migräne
+   * gleichrangig nebeneinander. Der Markenname bleibt bewusst draußen —
+   * § 10 HWG untersagt Publikumswerbung für verschreibungspflichtige
+   * Arzneimittel, und die Berufsordnung verlangt sachliche Information.
+   */
   {
-    titel: 'Ästhetische Medizin',
+    titel: 'Botulinumtoxin',
     icon: 'sparkles',
-    punkte: ['Faltenbehandlung mit Botulinumtoxin'],
+    punkte: [
+      'Ästhetische Faltenbehandlung',
+      'Behandlung bei chronischer Migräne',
+    ],
   },
 ];
 

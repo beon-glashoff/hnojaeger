@@ -1,9 +1,9 @@
 ---
-import { getImage, Picture } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
-import portrait2 from '../assets/images/portrait-2.png';
-import portraitMobil from '../assets/images/portrait-hoch-mobil.png';
+import heroQuer from '../assets/images/hero-quer.jpg';
+import heroHoch from '../assets/images/hero-hoch.png';
 import { site, taetigkeitsorte } from '../data/site';
 import { schwerpunkte, leistungsspektrum, vita, qualifikationen } from '../data/content';
 
@@ -17,42 +17,103 @@ import { schwerpunkte, leistungsspektrum, vita, qualifikationen } from '../data/
  */
 
 /*
- * Art Direction für den Vollbild-Hero: Das Querformat (Portrait 2) trägt den
+ * Art Direction für den Vollbild-Hero: Das Querformat trägt den
  * Desktop — sie steht links, der Text sitzt rechts im Raum. In einen hohen
  * Telefonausschnitt gerechnet würde derselbe Anschnitt sie zerschneiden,
  * deshalb liefert Mobil das Hochformat. `<picture>` ist hier handgebaut,
  * weil Astros <Picture> nur eine Quelle kennt — so lädt auch nur eine Datei.
  */
 const wide = await Promise.all(
-  [1200, 1600, 2000, 2560].map((w) =>
-    getImage({ src: portrait2, width: w, format: 'avif', quality: 74 })
+  [720, 1000, 1280, 1572].map((w) =>
+    getImage({ src: heroQuer, width: w, format: 'avif', quality: 74 })
   )
 );
 const wideWebp = await Promise.all(
-  [1200, 1600, 2000].map((w) =>
-    getImage({ src: portrait2, width: w, format: 'webp', quality: 76 })
+  [720, 1000, 1572].map((w) =>
+    getImage({ src: heroQuer, width: w, format: 'webp', quality: 76 })
   )
 );
-/* Für den Telefonausschnitt gibt es eine eigene Aufnahme: 898 × 1751,
-   fast genau das Seitenverhältnis eines Telefons. Sie steht im oberen
-   Drittel, darunter bleibt Raum für den Text — nichts überlagert sie. */
+/* Für den Telefonausschnitt gibt es eine eigene Aufnahme im Hochformat
+   (1086 × 1540). Derselbe Moment wie im Querformat, nur anders gerahmt —
+   beschnitten wirkte das Querformat auf dem Telefon beliebig. */
 const tall = await Promise.all(
-  [640, 900, 1200].map((w) =>
-    getImage({ src: portraitMobil, width: w, format: 'avif', quality: 74 })
+  [540, 760, 1086].map((w) =>
+    getImage({ src: heroHoch, width: w, format: 'avif', quality: 74 })
   )
 );
 const tallWebp = await Promise.all(
-  [640, 900, 1200].map((w) =>
-    getImage({ src: portraitMobil, width: w, format: 'webp', quality: 76 })
+  [540, 760, 1086].map((w) =>
+    getImage({ src: heroHoch, width: w, format: 'webp', quality: 76 })
   )
 );
-const fallback = await getImage({ src: portrait2, width: 1600, format: 'jpeg', quality: 76 });
+const fallback = await getImage({ src: heroQuer, width: 1572, format: 'jpeg', quality: 76 });
 
 const srcset = (imgs: { src: string; attributes?: Record<string, unknown> }[], widths: number[]) =>
   imgs.map((img, i) => `${img.src} ${widths[i]}w`).join(', ');
 
 const MOBILE = '(max-width: 47.999rem)';
 const DESKTOP = '(min-width: 48rem)';
+
+/*
+ * Dieselbe Art Direction für die vier Kacheln: Einspaltig auf dem Telefon
+ * trägt das Querformat, ab zwei Spalten steht wieder das Hochformat. Der
+ * Umschaltpunkt ist derselbe, an dem das Raster von einer auf zwei Spalten
+ * geht (40rem) — sonst stünde ein Querformat in einer schmalen Spalte.
+ */
+/*
+ * Die Kompetenzen stehen alphabetisch — bei einer Schlagwortliste, die
+ * überflogen wird, ist das die einzige Ordnung, die jemand ohne Erklärung
+ * findet. `localeCompare` mit 'de', damit Umlaute einsortiert werden und
+ * nicht hinten landen.
+ *
+ * Sieben Gruppen ergäben im dreispaltigen Raster zweieinhalb Zeilen, die
+ * letzte stünde allein. Deshalb teilen sich zwei Gruppen eine Zelle und
+ * stehen dort untereinander. Welche beiden, steht hier ausdrücklich statt
+ * gerechnet: Es sind die beiden kürzesten, aber sie stehen alphabetisch
+ * nicht nebeneinander. „Nase und Nebenhöhlen" rückt deshalb aus seiner
+ * Position nach vorn in die Zelle von „Botulinumtoxin"; alle übrigen
+ * Gruppen bleiben in der alphabetischen Folge.
+ */
+const PAAR = ['Botulinumtoxin', 'Nase und Nebenhöhlen'] as const;
+
+const kompetenzenAlphabetisch = [...leistungsspektrum].sort((a, b) =>
+  a.titel.localeCompare(b.titel, 'de')
+);
+
+const partner = kompetenzenAlphabetisch.find((g) => g.titel === PAAR[1]);
+if (!partner || !kompetenzenAlphabetisch.some((g) => g.titel === PAAR[0])) {
+  // Lieber der Build als eine Übersicht, die unbemerkt auseinanderfällt.
+  throw new Error(`Kompetenzen: Gruppe aus PAAR nicht gefunden (${PAAR.join(', ')})`);
+}
+
+const kompetenzSpalten = kompetenzenAlphabetisch.flatMap((gruppe) => {
+  if (gruppe.titel === PAAR[1]) return [];
+  return [gruppe.titel === PAAR[0] ? [gruppe, partner] : [gruppe]];
+});
+
+const KACHEL_SCHMAL = '(max-width: 39.999rem)';
+const KACHEL_BREIT = '(min-width: 40rem)';
+const KACHEL_QUER = [540, 760, 1080];
+const KACHEL_HOCH = [360, 540, 760, 1024];
+const KACHEL_GROESSEN = '(min-width: 64rem) 24vw, (min-width: 40rem) 46vw, 100vw';
+
+const kacheln = await Promise.all(
+  schwerpunkte.map(async (s) => {
+    const satz = (src: ImageMetadata, breiten: number[], format: 'avif' | 'webp') =>
+      Promise.all(
+        breiten.map((width) =>
+          getImage({ src, width, format, quality: format === 'avif' ? 72 : 74 })
+        )
+      );
+    return {
+      querAvif: await satz(s.bildQuer, KACHEL_QUER, 'avif'),
+      querWebp: await satz(s.bildQuer, KACHEL_QUER, 'webp'),
+      hochAvif: await satz(s.bild, KACHEL_HOCH, 'avif'),
+      hochWebp: await satz(s.bild, KACHEL_HOCH, 'webp'),
+      rueckfall: await getImage({ src: s.bild, width: 760, format: 'jpeg', quality: 74 }),
+    };
+  })
+);
 ---
 
 <BaseLayout
@@ -61,20 +122,20 @@ const DESKTOP = '(min-width: 48rem)';
   modeToggle
   profilePage
   title="Dr. med. Anne Jäger – Fachärztin für HNO-Heilkunde"
-  description="Dr. med. Anne Jäger ist Fachärztin für Hals-Nasen-Ohrenheilkunde mit den Schwerpunkten Schlafmedizin, Allergologie, Kinder-HNO und ästhetischer Medizin. Derzeit tätig in Köln-Rodenkirchen und Hennef."
+  description="Dr. med. Anne Jäger ist Fachärztin für Hals-Nasen-Ohrenheilkunde mit den Schwerpunkten Allergologie, Kinder-HNO, Präventivmedizin, schlafmedizinische Diagnostik und ästhetische Medizin. Derzeit tätig in Köln-Rodenkirchen und Hennef."
 >
   {/* ======================================== Hero: Vollbild mit Verlauf */}
   <section class="hero">
     <picture class="hero__pic">
-      <source media={MOBILE} type="image/avif" srcset={srcset(tall, [640, 900, 1200])} sizes="100vw" />
-      <source media={MOBILE} type="image/webp" srcset={srcset(tallWebp, [640, 900, 1200])} sizes="100vw" />
-      <source media={DESKTOP} type="image/avif" srcset={srcset(wide, [1200, 1600, 2000, 2560])} sizes="100vw" />
-      <source media={DESKTOP} type="image/webp" srcset={srcset(wideWebp, [1200, 1600, 2000])} sizes="100vw" />
+      <source media={MOBILE} type="image/avif" srcset={srcset(tall, [540, 760, 1086])} sizes="100vw" />
+      <source media={MOBILE} type="image/webp" srcset={srcset(tallWebp, [540, 760, 1086])} sizes="100vw" />
+      <source media={DESKTOP} type="image/avif" srcset={srcset(wide, [720, 1000, 1280, 1572])} sizes="100vw" />
+      <source media={DESKTOP} type="image/webp" srcset={srcset(wideWebp, [720, 1000, 1572])} sizes="100vw" />
       <img
         src={fallback.src}
         alt={`${site.name}, ${site.role}`}
-        width={1536}
-        height={1024}
+        width={1572}
+        height={1136}
         loading="eager"
         fetchpriority="high"
         decoding="async"
@@ -91,8 +152,8 @@ const DESKTOP = '(min-width: 48rem)';
           <span class="hero__role label">{site.role}</span>
         </h1>
         <p class="lead hero__lead">
-          Allergologie, Schlafmedizin, Kinder-HNO und ästhetische Medizin.
-          Derzeit tätig in Köln-Rodenkirchen und Hennef.
+          Allergologie, Kinder-HNO, Präventivmedizin, schlafmedizinische
+          Diagnostik und ästhetische Medizin.
         </p>
       </div>
     </div>
@@ -101,13 +162,15 @@ const DESKTOP = '(min-width: 48rem)';
   {/* ===================================================== Statement */}
   <section class="section section--subtle">
     <div class="container">
-      <p class="label reveal">Ärztliches Selbstverständnis</p>
+      {/* Der Name steht jetzt über dem Zitat statt darunter; die frühere
+          Signaturzeile wäre daneben eine Dopplung. */}
+      <p class="label reveal">Dr. med. Anne Jäger</p>
       <blockquote class="statement reveal">
-        Ich habe in Frankfurt, Wien und Durban gelernt, dass gute Medizin mit
-        Zuhören beginnt. Vieles, was in der Hals-Nasen-Ohrenheilkunde als
-        Alltagsbeschwerde abgetan wird, hat eine Ursache, die sich finden lässt.
+        Mein Blick geht über die Behandlung akuter Beschwerden hinaus:
+        Gesundheit erhalten, Risiken früh erkennen, Erkrankungen vorbeugen.
+        Vor allem aber möchte ich eines — Ihnen zuhören, Ihre Anliegen
+        verstehen und mir Zeit für Sie nehmen.
       </blockquote>
-      <p class="statement__cite small reveal">Dr. med. Anne Jäger</p>
     </div>
   </section>
 
@@ -123,21 +186,25 @@ const DESKTOP = '(min-width: 48rem)';
       <h2 class="h2 sec__title reveal">Was mir besonders am Herzen liegt</h2>
 
       <ul class="rows reveal">
-        {schwerpunkte.map((s) => (
+        {schwerpunkte.map((s, i) => (
           <li class="row">
             <a href={`/leistungen/${s.slug}/`} class="row__link">
               <span class="row__media">
-                <Picture
-                  src={s.bild}
-                  alt={s.bildAlt}
-                  widths={[360, 540, 760]}
-                  sizes="(min-width: 64rem) 24vw, (min-width: 40rem) 46vw, 100vw"
-                  formats={['avif', 'webp']}
-                  fallbackFormat="jpeg"
-                  quality={72}
-                  loading="lazy"
-                  class="row__img"
-                />
+                <picture class="row__pic">
+                  <source media={KACHEL_SCHMAL} type="image/avif" srcset={srcset(kacheln[i].querAvif, KACHEL_QUER)} sizes="100vw" />
+                  <source media={KACHEL_SCHMAL} type="image/webp" srcset={srcset(kacheln[i].querWebp, KACHEL_QUER)} sizes="100vw" />
+                  <source media={KACHEL_BREIT} type="image/avif" srcset={srcset(kacheln[i].hochAvif, KACHEL_HOCH)} sizes={KACHEL_GROESSEN} />
+                  <source media={KACHEL_BREIT} type="image/webp" srcset={srcset(kacheln[i].hochWebp, KACHEL_HOCH)} sizes={KACHEL_GROESSEN} />
+                  <img
+                    src={kacheln[i].rueckfall.src}
+                    alt={s.bildAlt}
+                    width={1024}
+                    height={1536}
+                    loading="lazy"
+                    decoding="async"
+                    class="row__img"
+                  />
+                </picture>
                 <span class="row__arrow"><Icon name="arrow-narrow-right" /></span>
               </span>
 
@@ -160,13 +227,21 @@ const DESKTOP = '(min-width: 48rem)';
       <h2 class="h2 sec__title reveal">Ihre Gesundheit im Fokus</h2>
 
       <dl class="spektrum reveal">
-        {leistungsspektrum.map((g) => (
+        {kompetenzSpalten.map((spalte) => (
           <div class="spektrum__row">
-            <dt class="label spektrum__group">
-              <Icon name={g.icon} class="spektrum__icon" />
-              <span>{g.titel}</span>
-            </dt>
-            <dd class="spektrum__items">{g.punkte.join('\u00A0· ')}</dd>
+            {spalte.map((g) => (
+              <div class="spektrum__block">
+                <dt class="label spektrum__group">
+                  <Icon name={g.icon} class="spektrum__icon" />
+                  <span>{g.titel}</span>
+                </dt>
+                <dd class="spektrum__items">
+                  <ul class="spektrum__list">
+                    {g.punkte.map((punkt) => <li>{punkt}</li>)}
+                  </ul>
+                </dd>
+              </div>
+            ))}
           </div>
         ))}
       </dl>
@@ -285,22 +360,17 @@ const DESKTOP = '(min-width: 48rem)';
   }
 
   /*
-   * Auf dem Telefon füllt die hohe Aufnahme den Ausschnitt exakt aus –
-   * es gibt keinen vertikalen Spielraum, `object-position` bleibt dort
-   * wirkungslos (gemessen: 0 px Überhang). Um den Ausschnitt trotzdem
-   * anzuheben, wird die Bildfläche 20 % höher als der Hero gemacht und
-   * oben herausgezogen. Prozentwerte in `inset` beziehen sich auf die
-   * Höhe des umgebenden Blocks – bei `margin` wäre es die Breite.
+   * Die frühere Aufnahme für das Telefon war mit 898 × 1751 höher als
+   * jeder Telefonausschnitt; sie musste über einen negativen `inset`
+   * angehoben werden. Die jetzige ist 1086 × 1540 und damit flacher: Sie
+   * füllt die Höhe exakt aus, und derselbe Kniff schnitte ihr den Kopf ab.
+   * Deshalb liegt sie bündig im Ausschnitt.
    */
-  @media (max-width: 47.999rem) {
-    .hero__pic { inset: -20% 0 0 0; }
-  }
   .hero__img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Mobil liegt die hohe Aufnahme an – sie steht dort im oberen Drittel */
-    object-position: 50% 8%;
+    object-position: 50% 50%;
     /* Sehr langsam und nur 4 % – die Bewegung soll man eher spüren
        als sehen. Läuft einmal und bleibt dann stehen. */
     animation: hero-zoom 26s var(--ease) forwards;
@@ -374,12 +444,15 @@ const DESKTOP = '(min-width: 48rem)';
           rgba(34, 38, 42, 0.18) 88%,
           rgba(34, 38, 42, 0) 100%
         ),
-        /* Rechts oben: trägt die Navigation. */
+        /* Rechts oben: trägt die Navigation. Die neue Aufnahme ist dort
+           deutlich heller als die vorige — mit den alten Werten fiel die
+           Navigation auf 5,0:1. Weiter aufgezogen (66 %) läge ein Schleier
+           über der Bildmitte; bei diesen Werten bleibt sie frei. */
         radial-gradient(
-          58% 44% at 100% 0%,
-          rgba(34, 38, 42, 0.84) 0%,
-          rgba(34, 38, 42, 0.46) 46%,
-          rgba(34, 38, 42, 0) 76%
+          62% 50% at 100% 0%,
+          rgba(34, 38, 42, 0.88) 0%,
+          rgba(34, 38, 42, 0.50) 50%,
+          rgba(34, 38, 42, 0) 80%
         ),
         /* Hinter der Wortmarke liegt ein Fenster – gemessen der hellste
            Punkt der ganzen Fläche. Der Kegel muss ihn tragen: bei 0,88 im
@@ -412,12 +485,23 @@ const DESKTOP = '(min-width: 48rem)';
   }
 
   .hero__h1 { display: grid; gap: var(--s-4); }
+  /*
+   * Versalien wie in der Wortmarke. `text-transform` statt Großbuchstaben
+   * im Text: Im Dokument steht weiter „Dr. Anne Jäger", und Vorleseprogramme
+   * sprechen den Namen, statt ihn zu buchstabieren. Versalien brauchen
+   * Laufweite statt der negativen Spationierung, die für Gemischtsatz
+   * gesetzt war, und tragen bei gleicher Schriftgröße optisch weiter —
+   * deshalb eine Stufe kleiner. Die Obergrenze ist gemessen, nicht
+   * geschätzt: Mit dieser Laufweite bricht „DR. ANNE JÄGER" in der 32rem
+   * breiten Textspalte ab 62 px um, deshalb 58 px als Obergrenze.
+   */
   .hero__name {
     display: block;
-    font-size: clamp(2.5rem, 1.2rem + 5.6vw, 5.25rem);
+    font-size: clamp(2rem, 1rem + 4.2vw, 3.625rem);
     font-weight: var(--fw-light);
-    line-height: 1.05;
-    letter-spacing: -0.025em;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
   /*
    * Über dem Bild trägt der normale Sekundärton nicht. Gemessen: der hellste
@@ -441,7 +525,6 @@ const DESKTOP = '(min-width: 48rem)';
   }
   /* --text-muted trägt im hellen Modus auf der gedämpften Fläche nicht
      (4,32:1 bei 15 px). Der Sekundärton hält in beiden Modi. */
-  .statement__cite { color: var(--text-secondary); }
 
   /* ------------------------------------ Schwerpunkte: vier Spalten */
   .rows {
@@ -527,6 +610,7 @@ const DESKTOP = '(min-width: 48rem)';
     .row__link:hover .row__arrow,
     .row__link:focus-visible .row__arrow { transform: none; }
   }
+  .row__pic { display: block; }
   .row__img {
     display: block;
     width: 100%;
@@ -535,6 +619,15 @@ const DESKTOP = '(min-width: 48rem)';
     object-fit: cover;
     object-position: 50% 24%;
     transition: transform 700ms var(--ease);
+  }
+  /*
+   * Einspaltig liegt das Querformat an. 16/9 ist das Maß der drei
+   * Vorlagen; die vierte ist 3/2 und wird oben und unten leicht
+   * beschnitten — ihr Motiv sitzt mittig, das trägt. Die Verschiebung
+   * nach oben gilt nur dem Hochformat.
+   */
+  @media (max-width: 39.999rem) {
+    .row__img { aspect-ratio: 16 / 9; object-position: 50% 50%; }
   }
   .row__link:hover .row__img { transform: scale(1.04); }
 
@@ -571,6 +664,7 @@ const DESKTOP = '(min-width: 48rem)';
    * Über die volle Fensterbreite wurde daraus eine sehr lange Laufzeile,
    * die das Auge nicht mehr greifen konnte. Jetzt dieselbe gestapelte Form
    * wie auf dem Telefon — Gruppe oben, Punkte darunter — nur in Spalten.
+   * Die Punkte stehen untereinander, nicht in einer Zeile.
    */
   .spektrum {
     display: grid;
@@ -579,7 +673,10 @@ const DESKTOP = '(min-width: 48rem)';
   @media (min-width: 40rem) { .spektrum { grid-template-columns: repeat(2, 1fr); } }
   @media (min-width: 64rem) { .spektrum { grid-template-columns: repeat(3, 1fr); } }
 
-  .spektrum__row { display: grid; gap: var(--s-4); align-content: start; }
+  /* Die Zelle kann zwei Gruppen tragen — der größere Abstand trennt sie,
+     der kleinere hält Gruppenzeile und Punkte zusammen. */
+  .spektrum__row { display: grid; gap: var(--s-8); align-content: start; }
+  .spektrum__block { display: grid; gap: var(--s-4); }
 
   .spektrum__group {
     display: flex;
@@ -595,8 +692,20 @@ const DESKTOP = '(min-width: 48rem)';
     margin: 0;
     color: var(--text-secondary);
     font-size: var(--fs-small);
-    line-height: 1.7;
   }
+  /*
+   * Eine Zeile je Punkt statt einer durchlaufenden Aufzählung: Wer die
+   * Schlagwörter nur überfliegt, findet sie so schneller. Die Haarlinien
+   * unter den Punkten nehmen die Linie unter der Gruppenzeile auf; die
+   * letzte entfällt, sonst schlösse die Spalte doppelt ab.
+   */
+  .spektrum__list { display: grid; }
+  .spektrum__list li {
+    padding-block: var(--s-3);
+    border-bottom: 1px solid var(--border);
+    line-height: 1.45;
+  }
+  .spektrum__list li:last-child { border-bottom: 0; padding-bottom: 0; }
 
   /* ------------------------------------------------------------- Vita */
   .vita + .vita { margin-top: var(--s-16); }

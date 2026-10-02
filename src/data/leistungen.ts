@@ -52,7 +52,7 @@ export const leistungen: Leistung[] = [
   /* ------------------------------------------------------ Schlafmedizin */
   {
     slug: 'schlafmedizin',
-    reihenfolge: 1,
+    reihenfolge: 3,
     navTitel: 'Schlafmedizin',
     h1: 'Schnarchen und Schlafapnoe',
     title: 'Schnarchen und Schlafapnoe – was dahintersteckt',
@@ -137,7 +137,7 @@ export const leistungen: Leistung[] = [
   /* ------------------------------------------------------- Allergologie */
   {
     slug: 'allergologie',
-    reihenfolge: 2,
+    reihenfolge: 1,
     navTitel: 'Allergologie',
     h1: 'Allergiediagnostik und Allergietherapie',
     title: 'Allergiediagnostik beim HNO-Arzt – Ablauf und Wege',
@@ -218,7 +218,7 @@ export const leistungen: Leistung[] = [
   /* --------------------------------------------------------- Kinder-HNO */
   {
     slug: 'kinder-hno',
-    reihenfolge: 3,
+    reihenfolge: 2,
     navTitel: 'Kinder-HNO',
     h1: 'Kinder-HNO',
     title: 'Kinder-HNO – Hören, Infekte, Paukenröhrchen',

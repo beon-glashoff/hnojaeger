@@ -108,7 +108,7 @@ export const leistungsspektrum: LeistungsGruppe[] = [
     icon: 'flower',
     punkte: [
       'Anamnese',
-      'Pricktestung',
+      'Hauttest (Pricktest)',
       'Blutuntersuchung (RAST-Test)',
       'Hyposensibilisierung\u00A0/\u00A0Immuntherapie',
     ],
@@ -224,13 +224,18 @@ export const vita: VitaGruppe[] = [
       { jahr: '2018–2025', text: 'Angestellte Fachärztin in einer HNO-Praxis', ort: 'Bonn' },
       {
         jahr: '2025',
-        text: 'Botulinumtoxin Grundkurs und Masterclass',
+        text: 'Botulinumtoxin Grundkurs',
         ort: 'Akademie für Kosmetische Medizin, Düsseldorf',
       },
       {
         jahr: '2025',
         text: 'Schlafmedizinischer BUB-Kurs',
         ort: 'Institut für Schlafmedizin, München',
+      },
+      {
+        jahr: '2026',
+        text: 'Botulinumtoxin Masterclass',
+        ort: 'Akademie für Kosmetische Medizin, Düsseldorf',
       },
       {
         jahr: '2026',

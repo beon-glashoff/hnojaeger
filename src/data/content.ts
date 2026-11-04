@@ -94,7 +94,12 @@ export const leistungsspektrum: LeistungsGruppe[] = [
     icon: 'nose',
     punkte: [
       'Behinderte Nasenatmung',
-      'Nasennebenhöhlenentzündung',
+      'Nasenscheidewandverkrümmung',
+      'Vergrößerte Nasenmuscheln',
+      'Akute und chronische Nebenhöhlenentzündung (Sinusitis)',
+      'Nasenpolypen',
+      'Nasenbluten',
+      'Vermindertes Riechvermögen (Hyposmie)',
     ],
   },
   /*
@@ -118,6 +123,7 @@ export const leistungsspektrum: LeistungsGruppe[] = [
     icon: 'ear',
     punkte: [
       'Hörminderung',
+      'Hörsturz',
       'Hörtest\u00A0/\u00A0Audiometrie',
       'Hörgeräteverordnung',
       'Ohrgeräusche\u00A0/\u00A0Tinnitus',
@@ -131,6 +137,8 @@ export const leistungsspektrum: LeistungsGruppe[] = [
       'Halsschmerzen',
       'Globus- und Fremdkörpergefühl',
       'Stimm- und Sprachstörungen',
+      'Kehlkopfuntersuchung',
+      'Speicheldrüsen',
       'Abklärung CMD und Bruxismus',
       'Ultraschall\u00A0/\u00A0Sonografie',
     ],
@@ -150,8 +158,36 @@ export const leistungsspektrum: LeistungsGruppe[] = [
     punkte: [
       'Hörprüfung bei Kindern',
       'Wiederkehrende Infekte',
+      'Vergrößerte Rachenmandeln (Adenoide)',
+      'Vergrößerte Gaumenmandeln (Tonsillenhyperplasie)',
       'Paukenröhrchen',
       'Atemwegsbeschwerden',
+    ],
+  },
+  {
+    titel: 'Schwindel',
+    icon: 'spiral',
+    punkte: [
+      'Diagnostik und Therapie',
+      'Lagerungsschwindel',
+      'Neuropathia vestibularis',
+      'Morbus Menière',
+    ],
+  },
+  /*
+   * Selbstzahlerleistungen stehen unter ihrem amtlichen Namen, nicht als
+   * „IGeL" — die Abkürzung kennt außerhalb von Praxen kaum jemand. Preise
+   * nennt die Seite nicht; sie hängen vom Aufwand ab und gehören ins
+   * Gespräch, nicht in eine Schlagwortliste.
+   */
+  {
+    titel: 'Individuelle Gesundheitsleistungen',
+    icon: 'clipboard-check',
+    punkte: [
+      'HNO-Tauchtauglichkeitsuntersuchung',
+      'Eignungs- und Vorsorgeuntersuchungen bei Stimm- und Sprechberufen',
+      'Reise- und Flugtauglichkeit',
+      'Medizinisches Ohrlochstechen',
     ],
   },
   /*

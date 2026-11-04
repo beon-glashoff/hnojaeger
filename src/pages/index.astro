@@ -66,30 +66,33 @@ const DESKTOP = '(min-width: 48rem)';
  * findet. `localeCompare` mit 'de', damit Umlaute einsortiert werden und
  * nicht hinten landen.
  *
- * Sieben Gruppen ergäben im dreispaltigen Raster zweieinhalb Zeilen, die
- * letzte stünde allein. Deshalb teilen sich zwei Gruppen eine Zelle und
- * stehen dort untereinander. Welche beiden, steht hier ausdrücklich statt
- * gerechnet: Es sind die beiden kürzesten, aber sie stehen alphabetisch
- * nicht nebeneinander. „Nase und Nebenhöhlen" rückt deshalb aus seiner
- * Position nach vorn in die Zelle von „Botulinumtoxin"; alle übrigen
- * Gruppen bleiben in der alphabetischen Folge.
+ * Neun Gruppen füllen das dreispaltige Raster genau aus. Solange die Zahl
+ * durch drei teilbar bleibt, steht jede Gruppe in einer eigenen Zelle;
+ * geht sie nicht auf, rücken die beiden kürzesten benachbarten Gruppen in
+ * eine Zelle, damit die letzte Zeile nicht halb leer endet.
  */
-const PAAR = ['Botulinumtoxin', 'Nase und Nebenhöhlen'] as const;
-
 const kompetenzenAlphabetisch = [...leistungsspektrum].sort((a, b) =>
   a.titel.localeCompare(b.titel, 'de')
 );
 
-const partner = kompetenzenAlphabetisch.find((g) => g.titel === PAAR[1]);
-if (!partner || !kompetenzenAlphabetisch.some((g) => g.titel === PAAR[0])) {
-  // Lieber der Build als eine Übersicht, die unbemerkt auseinanderfällt.
-  throw new Error(`Kompetenzen: Gruppe aus PAAR nicht gefunden (${PAAR.join(', ')})`);
-}
+const gehtAuf = kompetenzenAlphabetisch.length % 3 === 0;
 
-const kompetenzSpalten = kompetenzenAlphabetisch.flatMap((gruppe) => {
-  if (gruppe.titel === PAAR[1]) return [];
-  return [gruppe.titel === PAAR[0] ? [gruppe, partner] : [gruppe]];
-});
+const paarAb = gehtAuf
+  ? -1
+  : kompetenzenAlphabetisch.reduce((beste, _gruppe, i, alle) => {
+      if (i === alle.length - 1) return beste;
+      const punkte = (n: number) => alle[n].punkte.length + alle[n + 1].punkte.length;
+      return punkte(i) < punkte(beste) ? i : beste;
+    }, 0);
+
+const kompetenzSpalten = kompetenzenAlphabetisch.reduce<(typeof kompetenzenAlphabetisch)[]>(
+  (spalten, gruppe, i) => {
+    if (i === paarAb + 1 && paarAb >= 0) spalten[spalten.length - 1].push(gruppe);
+    else spalten.push([gruppe]);
+    return spalten;
+  },
+  []
+);
 
 const KACHEL_SCHMAL = '(max-width: 39.999rem)';
 const KACHEL_BREIT = '(min-width: 40rem)';
@@ -122,7 +125,7 @@ const kacheln = await Promise.all(
   modeToggle
   profilePage
   title="Dr. med. Anne Jäger – Fachärztin für HNO-Heilkunde"
-  description="Dr. med. Anne Jäger ist Fachärztin für Hals-Nasen-Ohrenheilkunde mit den Schwerpunkten Allergologie, Kinder-HNO, Präventivmedizin, schlafmedizinische Diagnostik und ästhetische Medizin. Derzeit tätig in Köln-Rodenkirchen und Hennef."
+  description="Dr. med. Anne Jäger ist Fachärztin für Hals-Nasen-Ohrenheilkunde mit den Schwerpunkten klassische HNO-Heilkunde, Allergologie, Kinder-HNO, Präventivmedizin, schlafmedizinische Diagnostik und ästhetische Medizin. Derzeit tätig in Köln-Rodenkirchen und Hennef."
 >
   {/* ======================================== Hero: Vollbild mit Verlauf */}
   <section class="hero">
@@ -152,8 +155,8 @@ const kacheln = await Promise.all(
           <span class="hero__role label">{site.role}</span>
         </h1>
         <p class="lead hero__lead">
-          Allergologie, Kinder-HNO, Präventivmedizin, schlafmedizinische
-          Diagnostik und ästhetische Medizin.
+          Klassische HNO, Allergologie, Kinder-HNO, Präventivmedizin,
+          schlafmedizinische Diagnostik und ästhetische Medizin.
         </p>
       </div>
     </div>
